@@ -1,8 +1,5 @@
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
-<<<<<<< HEAD
 import { Triangle } from './Triangle';
-=======
->>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
 
 export class Scene2D {
 	
@@ -11,10 +8,7 @@ export class Scene2D {
   private m_width;
   private m_height;
   private m_fieldOfViewDegree;
-<<<<<<< HEAD
   private m_aspectRatio;
-=======
->>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
 
   private m_positions = [
 		 0.5,  0.5,0.0,
@@ -22,7 +16,6 @@ export class Scene2D {
 		 0.5, -0.5,0.0
   ];
   
-<<<<<<< HEAD
   
   private m_triangles:Triangle[] = [];
   
@@ -48,11 +41,6 @@ export class Scene2D {
 			vec3.fromValues( -4, 2.5,0.0)
 	       ) );
 	  
-=======
-  private m_vertexCount = 3;
-  
-  constructor(width, height, fieldOfViewDegree, zNear, zFar, translateZ) {
->>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
 	  this.m_projectionMatrix = mat4.create();
 	  
 	  this.m_width = width;
@@ -61,11 +49,8 @@ export class Scene2D {
 	  
 	  let fieldOfViewRadian = fieldOfViewDegree * Math.PI / 180;
 	  let aspect = width/height;
-<<<<<<< HEAD
 	  
 	  this.m_aspectRatio = aspect;
-=======
->>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
 	 
 	  mat4.perspective(this.m_projectionMatrix,
 					   fieldOfViewRadian,
@@ -80,7 +65,6 @@ export class Scene2D {
 					 [0.0, 0.0, translateZ]);
   }
   
-<<<<<<< HEAD
   getRayTo2DPoint(x,y):vec3[] {
 	 
 		//let fov = 45;
@@ -118,8 +102,6 @@ export class Scene2D {
 		return [ rayOrigin, normalizedRayDirection ]; 
   }
   
-=======
->>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
   get projectionMatrix(): mat4 {
         return this.m_projectionMatrix;
   }
@@ -136,11 +118,9 @@ export class Scene2D {
 	    return this.m_vertexCount;
   }
   
-<<<<<<< HEAD
   get triangles():Triangle[] {
 	    return this.m_triangles;
   }
   
-=======
->>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
+
 }
