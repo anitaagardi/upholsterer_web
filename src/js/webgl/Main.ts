@@ -1,9 +1,12 @@
 import { Scene2D } from './Scene2D';
 
+<<<<<<< HEAD
 interface ClickCallback {
 	(x,y):void;
 }
 
+=======
+>>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
 export class Main {
 
     private canvas:HTMLCanvasElement;
@@ -64,6 +67,7 @@ export class Main {
 
 	  this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
+<<<<<<< HEAD
 	  for(let i=0; i<scene.triangles.length; i++) {
 
 		  let buffers = this.initBuffers(scene.triangles[i].getVerticesArray());
@@ -107,6 +111,47 @@ export class Main {
 	
 	}
 	
+=======
+
+	  let buffers = this.initBuffers(scene.positions);
+
+	  {
+		const numComponents = 3;
+		const type = this.gl.FLOAT;
+		const normalize = false;
+		const stride = 0;
+		const offset = 0;
+		
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+		this.gl.vertexAttribPointer(
+			this.programInfo.attribLocations.vertexPosition,
+			numComponents,
+			type,
+			normalize,
+			stride,
+			offset);
+		this.gl.enableVertexAttribArray(
+			this.programInfo.attribLocations.vertexPosition);
+	  }
+
+
+	  this.gl.useProgram(this.programInfo.program);
+
+	  this.gl.uniformMatrix4fv(
+		  this.programInfo.uniformLocations.projectionMatrix,
+		  false,
+		  scene.projectionMatrix);
+	  this.gl.uniformMatrix4fv(
+		  this.programInfo.uniformLocations.modelViewMatrix,
+		  false,
+		  scene.modelViewMatrix);
+
+	  {
+		const offset = 0;
+		let vertexCount = scene.vertexCount;
+		this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
+	  }
+>>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
 	}
 
 
@@ -144,6 +189,7 @@ export class Main {
 
 	  return shader;
 	}
+<<<<<<< HEAD
 	
 	subscribeClick(clickCallback: ClickCallback):void {
 		this.canvas.addEventListener("click", ( event ) => {
@@ -154,4 +200,7 @@ export class Main {
 			 clickCallback(x,y);
 		}, false);
 	}
+=======
+
+>>>>>>> 6c1a00ae7387bab65bea897bc23b866c253d3965
 }
