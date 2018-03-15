@@ -30,6 +30,7 @@ export class Main {
 			program: this.shaderProgram,
 			attribLocations: {
 			  vertexPosition: this.gl.getAttribLocation(this.shaderProgram, 'aVertexPosition'),
+			  vertexColor: this.gl.getAttribLocation(this.shaderProgram, 'aVertexColor')
 			},
 			uniformLocations: {
 			  projectionMatrix: this.gl.getUniformLocation(this.shaderProgram, 'uProjectionMatrix'),
@@ -39,7 +40,7 @@ export class Main {
 				
 	}
 	
-	initBuffers(positions) {
+	initBuffers(positions, colors) {
 
 	  const positionBuffer = this.gl.createBuffer();
 
@@ -49,63 +50,96 @@ export class Main {
 	  this.gl.bufferData(this.gl.ARRAY_BUFFER,
 					new Float32Array(positions),
 					this.gl.STATIC_DRAW);
+					
+					
+	   const colorBuffer = this.gl.createBuffer();
+	   this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+       this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
 
 	  return {
 		position: positionBuffer,
+		color: colorBuffer
 	  };
 	}
 
 	drawScene(scene:Scene2D) {
-	  this.gl.clearColor(0.0, 0.0, 0.0, 1.0);  
+	//TODO: new color
+	  this.gl.clearColor(0,0,255,0.3);  
 	  this.gl.clearDepth(1.0);              
 	  this.gl.enable(this.gl.DEPTH_TEST);
 	  this.gl.depthFunc(this.gl.LEQUAL);
+	  
+	   const colors = [
+		1.0,  0.0,  0.0,  1.0,    // red
+		1.0,  0.0,  0.0,  1.0,    // red
+		1.0,  0.0,  0.0,  1.0    // red
+	  ];
 
 
 	  this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+		for(let i=0;i<scene.rooms.length;i++){
+		  for(let j=0; j<scene.rooms[i].squares.length; j++) {
+			for(let k=0;k<scene.rooms[i].squares[j].triangles.length;k++){
 
-	  for(let i=0; i<scene.triangles.length; i++) {
+			  let buffers = this.initBuffers(scene.rooms[i].squares[j].triangles[k].getVerticesArray(),scene.rooms[i].squares[j].triangles[k].getColorArray());
 
-		  let buffers = this.initBuffers(scene.triangles[i].getVerticesArray());
+			  {
+				const numComponents = 3;
+				const type = this.gl.FLOAT;
+				const normalize = false;
+				const stride = 0;
+				const offset = 0;
+				
+				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+				this.gl.vertexAttribPointer(
+					this.programInfo.attribLocations.vertexPosition,
+					numComponents,
+					type,
+					normalize,
+					stride,
+					offset);
+				this.gl.enableVertexAttribArray(
+					this.programInfo.attribLocations.vertexPosition);
+			  }
 
-		  {
-			const numComponents = 3;
-			const type = this.gl.FLOAT;
-			const normalize = false;
-			const stride = 0;
-			const offset = 0;
-			
-			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-			this.gl.vertexAttribPointer(
-				this.programInfo.attribLocations.vertexPosition,
-				numComponents,
-				type,
-				normalize,
-				stride,
-				offset);
-			this.gl.enableVertexAttribArray(
-				this.programInfo.attribLocations.vertexPosition);
-		  }
+			  {
+				const numComponents = 4;
+				const type = this.gl.FLOAT;
+				const normalize = false;
+				const stride = 0;
+				const offset = 0;
+				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+				this.gl.vertexAttribPointer(
+					this.programInfo.attribLocations.vertexColor,
+					numComponents,
+					type,
+					normalize,
+					stride,
+					offset);
+				this.gl.enableVertexAttribArray(
+					this.programInfo.attribLocations.vertexColor);
+			  }
+			  
+			  this.gl.useProgram(this.programInfo.program);
 
+			  this.gl.uniformMatrix4fv(
+				  this.programInfo.uniformLocations.projectionMatrix,
+				  false,
+				  scene.projectionMatrix);
+			  this.gl.uniformMatrix4fv(
+				  this.programInfo.uniformLocations.modelViewMatrix,
+				  false,
+				  scene.modelViewMatrix);
 
-		  this.gl.useProgram(this.programInfo.program);
-
-		  this.gl.uniformMatrix4fv(
-			  this.programInfo.uniformLocations.projectionMatrix,
-			  false,
-			  scene.projectionMatrix);
-		  this.gl.uniformMatrix4fv(
-			  this.programInfo.uniformLocations.modelViewMatrix,
-			  false,
-			  scene.modelViewMatrix);
-
-		  {
-			const offset = 0;
-			let vertexCount = scene.vertexCount;
-			this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
-		  }
-	
-	}
+			  {
+				const offset = 0;
+				let vertexCount = scene.vertexCount;
+				this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
+			  }
+		
+		}
+	  }
+	 }
   }
 
 

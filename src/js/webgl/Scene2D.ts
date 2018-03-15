@@ -1,6 +1,7 @@
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 import { Triangle } from './Triangle';
-
+import { Square } from './Square';
+import { Room } from './Room';
 export class Scene2D {
 	
   private m_projectionMatrix:mat4;
@@ -18,18 +19,60 @@ export class Scene2D {
   
   
   private m_triangles:Triangle[] = [];
-  
+  private m_squares:Square[]=[];
+  private m_rooms:Room[]=[];
   private m_vertexCount = 3;
   
   constructor(width, height, fieldOfViewDegree, zNear, zFar, translateZ) {
 	  
-	  this.m_triangles.push ( new Triangle(
+	 /* this.m_triangles.push ( new Triangle(
             vec3.fromValues(0.5, 0.5,0.0),
 			vec3.fromValues(-0.5,0.5,0.0),
 			vec3.fromValues( 0.5, -0.5,0.0)
 	       ) );
 		   
 	  this.m_triangles.push ( new Triangle(
+            vec3.fromValues(-0.5, -0.5,0.0),
+			vec3.fromValues(-0.5,0.5,0.0),
+			vec3.fromValues( 0.5, -0.5,0.0)
+	       ) );
+	*/	   
+		   
+		   /*this.m_squares.push(new Square(new Triangle(
+            vec3.fromValues(0.5, 0.5,0.0),
+			vec3.fromValues(-0.5,0.5,0.0),
+			vec3.fromValues( 0.5, -0.5,0.0)
+	       ),new Triangle(
+            vec3.fromValues(-0.5, -0.5,0.0),
+			vec3.fromValues(-0.5,0.5,0.0),
+			vec3.fromValues( 0.5, -0.5,0.0)
+	       ) ));*/
+		  /* 
+		  csak a négyszögek
+		  this.m_squares.push(new Square(
+			vec3.fromValues(0.5, 0.5,0.0),
+			vec3.fromValues(-0.5,0.5,0.0),
+			vec3.fromValues( 0.5, -0.5,0.0),
+			vec3.fromValues(-0.5, -0.5,0.0)
+		   ));
+		   
+		   this.m_squares.push(new Square(
+			vec3.fromValues(1, 1,0.0),
+			vec3.fromValues(2,2,0.0),
+			vec3.fromValues( 2, 1,0.0),
+			vec3.fromValues(1, 2,0.0)
+		   ));*/
+		   
+		this.m_rooms.push(new Room(new Square(
+			vec3.fromValues(1, 1,0.0),
+			vec3.fromValues(2,2,0.0),
+			vec3.fromValues( 2, 1,0.0),
+			vec3.fromValues(1, 2,0.0),
+			vec4.fromValues(192, 192,192,1.0)
+		   ),0.05) );
+		   
+		   
+	  /*this.m_triangles.push ( new Triangle(
             vec3.fromValues(2.5, 0.5,0.0),
 			vec3.fromValues(1.5,0.5,0.0),
 			vec3.fromValues( 2.5, -0.5,0.0)
@@ -39,7 +82,8 @@ export class Scene2D {
             vec3.fromValues(-4, -2.5,0.0),
 			vec3.fromValues(-2,-2.5,0.0),
 			vec3.fromValues( -4, 2.5,0.0)
-	       ) );
+	       ) );*/
+	   
 	  
 	  this.m_projectionMatrix = mat4.create();
 	  
@@ -120,6 +164,13 @@ export class Scene2D {
   
   get triangles():Triangle[] {
 	    return this.m_triangles;
+  }
+  get squares():Square[] {
+	    return this.m_squares;
+  }
+  
+  get rooms():Room[] {
+	    return this.m_rooms;
   }
   
 

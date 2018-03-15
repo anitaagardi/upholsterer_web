@@ -2,9 +2,10 @@ import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 
 export class Triangle {
 	  private vertices:vec3[] = [];
-	  
-	  constructor(v0:vec3, v1:vec3, v2:vec3) {
+	  private color:vec4;
+	  constructor(v0:vec3, v1:vec3, v2:vec3,color:vec4) {
 		 this.vertices = [...this.vertices, v0, v1, v2];
+		 this.color=color;
 	  }
   
       //modelViewMatrix: to world
@@ -77,6 +78,13 @@ export class Triangle {
 			this.vertices[0][0],this.vertices[0][1], this.vertices[0][2],
 			this.vertices[1][0],this.vertices[1][1], this.vertices[1][2],
 			this.vertices[2][0],this.vertices[2][1], this.vertices[2][2]
+		];
+	}
+	getColorArray(){
+		return [
+		   this.color[0],this.color[1],this.color[2],this.color[3],
+		   this.color[0],this.color[1],this.color[2],this.color[3],
+		   this.color[0],this.color[1],this.color[2],this.color[3]
 		];
 	}
 }
