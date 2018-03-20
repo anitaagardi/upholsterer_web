@@ -210,7 +210,7 @@ export class Scene2D {
 
 		let rayOrigin = vec3.fromValues(0, 0, 0);
 
-		let rayDirection = vec3.create();
+		/*let rayDirection = vec3.create();
 		vec3.subtract(rayDirection, vec3.fromValues(Px, Py, -1), rayOrigin);
 
 		console.log(Math.sqrt(Px * Px + Py * Py + 1));
@@ -225,6 +225,9 @@ export class Scene2D {
 
 		//world-be vagyunk, a modellre vissza kell alakítani
 		return vec3.fromValues(normalizedRayDirection[0] * 5, normalizedRayDirection[1] * 5, (normalizedRayDirection[2] * 5) + 5);
+		*/
+		
+		return vec3.fromValues(Px*5, Py*5, (-1)*5 + 5);
 	   
 	}
 

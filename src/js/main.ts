@@ -51,7 +51,8 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	*/
 	
 	let square = new Square();
-    square.createFromPixel([ vec3.fromValues(roomUpperLeftX, roomUpperLeftY,0), 
+    
+	/*square.createFromPixel([ vec3.fromValues(roomUpperLeftX, roomUpperLeftY,0), 
 		scene2D.convert2DPointTo3DWorld(roomUpperLeftX, roomUpperLeftY)
 	  ],
 	  [vec3.fromValues(roomUpperLeftX +roomWidth, roomUpperLeftY,0),
@@ -64,10 +65,17 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 		  scene2D.convert2DPointTo3DWorld(roomUpperLeftX +roomWidth, roomUpperLeftY + roomHeight)
 	  ],
 	  vec4.fromValues(192, 192, 192, 1.0)
-	);	
-
+	);	*/
+	
+	square.createFromVec( 
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX, roomUpperLeftY),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX +roomWidth, roomUpperLeftY),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX, roomUpperLeftY + roomHeight),
+        scene2D.convert2DPointTo3DWorld(roomUpperLeftX +roomWidth, roomUpperLeftY + roomHeight),
+	    vec4.fromValues(192, 192, 192, 1.0)
+	);
+	
 	scene2D.rooms.push(new Room(square, 0.05));
-
 
 	main.drawScene(scene2D);
 });
