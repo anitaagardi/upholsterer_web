@@ -10,7 +10,7 @@ import { vertexShaderSource } from './webgl/shaders/vertex';
 
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 
-let scene2D = new Scene2D(1000, 800, 45, 0.1, 100, -5.0);
+let scene2D = new Scene2D(1000, 800, 45, 0.1, 100, -5.0,true);
 let main = new Main('#glcanvas', vertexShaderSource, fragmentShaderSource);
 
 let points: vec3[] = [];
@@ -75,7 +75,10 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	    vec4.fromValues(192, 192, 192, 1.0)
 	);
 	
-	scene2D.rooms.push(new Room(square, 0.05));
+	if(!(new Room(square, 0.05).contains(scene2D.rooms))){
+		scene2D.rooms.push(new Room(square, 0.05));
+	}
+	//scene2D.rooms.push(new Room(square, 0.05));
 
 	main.drawScene(scene2D);
 });
@@ -124,6 +127,7 @@ main.subscribeClick((x, y) => {
 			break;
 		}
 	}
+	//main.drawGrids();
 
 	//alert(result);
 });

@@ -10,6 +10,7 @@ export class Room {
 	private right_square: Square;
 	private line_size: number;
 	private m_squares: Square[] = [];
+	
 	constructor(square: Square, line_size: number) {
 		this.basic_square = square;
 		this.line_size = line_size;
@@ -63,6 +64,30 @@ export class Room {
 		this.m_squares[3] = this.left_square;
 		this.m_squares[4] = this.right_square;
 		return this.m_squares;
+	}
+	contains(m_rooms:Room[]):boolean{
+		console.log()
+
+		for(var i=0;i<m_rooms.length;i++){
+			var count=0;
+			var widthThis=Math.abs(this.squares[1].leftUpperCoordinate[0]-this.squares[1].rightUpperCoordinate[0]);
+			var widthActual=Math.abs(m_rooms[i].squares[1].leftUpperCoordinate[0]-m_rooms[i].squares[1].rightUpperCoordinate[0]);
+			var comparableNumberWidth=Math.abs(this.squares[1].leftUpperCoordinate[0]-m_rooms[i].squares[1].rightUpperCoordinate[0]);
+			if(widthThis+widthActual>comparableNumberWidth){
+				count=count+1;
+			}
+			var heightThis=Math.abs(this.squares[3].rightUpperCoordinate[1]-this.squares[3].rightLowerCoordinate[1]);
+			var heightActual=Math.abs(m_rooms[i].squares[3].rightUpperCoordinate[1]-this.squares[3].rightLowerCoordinate[1]);
+			var comparableNumberHeight=Math.abs(this.squares[3].rightUpperCoordinate[1]-this.squares[3].rightLowerCoordinate[1]);
+			if(heightThis+widthActual>comparableNumberWidth){
+				count=count+1;
+			}
+			if(count>1){
+				return true;
+			}
+			
+		}
+		return false;
 	}
 
 

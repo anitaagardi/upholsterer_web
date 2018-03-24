@@ -40,6 +40,7 @@ export class Main {
 
 	}
 
+	//TODO: szín legyen opcionális
 	initBuffers(positions, colors) {
 
 		const positionBuffer = this.gl.createBuffer();
@@ -64,19 +65,97 @@ export class Main {
 
 	drawScene(scene: Scene2D) {
 		//TODO: new color
-		this.gl.clearColor(0, 0, 255, 0.3);
+		//this.gl.clearColor(0, 0, 255, 0.3);
+		this.gl.clearColor(0.5, 0.5, 0.5, 0.9);
 		this.gl.clearDepth(1.0);
 		this.gl.enable(this.gl.DEPTH_TEST);
 		this.gl.depthFunc(this.gl.LEQUAL);
 
-		const colors = [
-			1.0, 0.0, 0.0, 1.0,    // red
-			1.0, 0.0, 0.0, 1.0,    // red
-			1.0, 0.0, 0.0, 1.0    // red
-		];
-
 
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+		var colors = [];
+		var vertices = [];
+		for (var i = 0; i < 2000; i = i + 50) {
+			//függőleges
+			colors = colors.concat([38.0, 38.0, 38.0, 1.0]);
+
+
+
+			let v = scene.convert2DPointTo3DWorld(i, 0);
+			vertices = vertices.concat([v[0], v[1], v[2]]);
+
+			v = scene.convert2DPointTo3DWorld(i, 800);
+			vertices = vertices.concat([v[0], v[1], v[2]]);
+			//vízszintes
+			colors = colors.concat([38.0, 38.0, 38.0, 1.0]);
+
+
+
+			v = scene.convert2DPointTo3DWorld(0, i);
+			vertices = vertices.concat([v[0], v[1], v[2]]);
+
+			v = scene.convert2DPointTo3DWorld(1000, i);
+			vertices = vertices.concat([v[0], v[1], v[2]]);
+
+
+		}
+		let buffers = this.initBuffers(vertices, colors);
+
+		{
+			const numComponents = 3;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+			this.gl.vertexAttribPointer(
+				this.programInfo.attribLocations.vertexPosition,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.programInfo.attribLocations.vertexPosition);
+		}
+
+		{
+			const numComponents = 4;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+			this.gl.vertexAttribPointer(
+				this.programInfo.attribLocations.vertexColor,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.programInfo.attribLocations.vertexColor);
+		}
+
+
+		//TODO: useProgram-t nem biztos, hogy mindig meg kellene hívni
+		this.gl.useProgram(this.programInfo.program);
+
+		this.gl.uniformMatrix4fv(
+			this.programInfo.uniformLocations.projectionMatrix,
+			false,
+			scene.projectionMatrix);
+		this.gl.uniformMatrix4fv(
+			this.programInfo.uniformLocations.modelViewMatrix,
+			false,
+			scene.modelViewMatrix);
+
+
+		this.gl.drawArrays(this.gl.LINES, 0, colors.length / 4);
+
+
+
 		for (let i = 0; i < scene.rooms.length; i++) {
 			for (let j = 0; j < scene.rooms[i].squares.length; j++) {
 				for (let k = 0; k < scene.rooms[i].squares[j].triangles.length; k++) {
@@ -201,6 +280,8 @@ export class Main {
 
 		}
 
+		//rács rajzolás
+
 
 	}
 
@@ -248,6 +329,45 @@ export class Main {
 
 			clickCallback(x, y);
 		}, false);
+	}
+	drawGrids() {
+		var vertices = [
+			-0.7, -0.1, 0,
+			-0.3, 0.6, 0,
+			-0.3, -0.3, 0,
+			0.2, 0.6, 0,
+			0.3, -0.3, 0,
+			0.7, 0.6, 0
+		]
+		const positionBuffer = this.gl.createBuffer();
+
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
+
+		// Get the attribute location
+		var coord = this.gl.getAttribLocation(this.shaderProgram, "coordinates");
+
+		// Point an attribute to the currently bound VBO
+		this.gl.vertexAttribPointer(coord, 3, this.gl.FLOAT, false, 0, 0);
+
+		// Enable the attribute
+		this.gl.enableVertexAttribArray(coord);
+
+		/*============ Drawing the triangle =============*/
+
+		// Clear the canvas
+		this.gl.clearColor(0.5, 0.5, 0.5, 0.9);
+
+		// Enable the depth test
+		this.gl.enable(this.gl.DEPTH_TEST);
+
+		// Clear the color and depth buffer
+		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
+		// Set the view port
+		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+
+		// Draw the triangle
+		this.gl.drawArrays(this.gl.LINES, 0, 6);
 	}
 
 }

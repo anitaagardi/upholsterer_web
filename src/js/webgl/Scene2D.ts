@@ -10,7 +10,7 @@ export class Scene2D {
 	private m_height;
 	private m_fieldOfViewDegree;
 	private m_aspectRatio;
-
+	private grid: boolean;
 	private m_positions = [
 		0.5, 0.5, 0.0,
 		-0.5, 0.5, 0.0,
@@ -23,7 +23,7 @@ export class Scene2D {
 	private m_rooms: Room[] = [];
 	private m_vertexCount = 3;
 
-	constructor(width, height, fieldOfViewDegree, zNear, zFar, translateZ) {
+	constructor(width, height, fieldOfViewDegree, zNear, zFar, translateZ, grid) {
 
 		/* this.m_triangles.push ( new Triangle(
 				vec3.fromValues(0.5, 0.5,0.0),
@@ -64,18 +64,18 @@ export class Scene2D {
 		  vec3.fromValues(1, 2,0.0)
 		 ));*/
 
-		 /*
-		 let square = new Square();
+		/*
+		let square = new Square();
 
-		 square.createFromVec(
-			vec3.fromValues(10, 10, 0.0),
-			vec3.fromValues(110, 110, 0.0),
-			vec3.fromValues(110, 10, 0.0),
-			vec3.fromValues(10, 110, 0.0),
-			vec4.fromValues(192, 192, 192, 1.0)
-		 );
+		square.createFromVec(
+		   vec3.fromValues(10, 10, 0.0),
+		   vec3.fromValues(110, 110, 0.0),
+		   vec3.fromValues(110, 10, 0.0),
+		   vec3.fromValues(10, 110, 0.0),
+		   vec4.fromValues(192, 192, 192, 1.0)
+		);
 
-		this.m_rooms.push(new Room(square, 0.05));*/
+	   this.m_rooms.push(new Room(square, 0.05));*/
 
 
 		/*this.m_triangles.push ( new Triangle(
@@ -90,9 +90,20 @@ export class Scene2D {
 			  vec3.fromValues( -4, 2.5,0.0)
 			 ) );*/
 
-
+			 ///EZ KELL MAJD!!!
+		/*let square = new Square();
+		square.createFromVec(
+			this.convert2DPointTo3DWorld(0, 0),
+			this.convert2DPointTo3DWorld(200, 0),
+			this.convert2DPointTo3DWorld(0, 200),
+			this.convert2DPointTo3DWorld(200, 200),
+			vec4.fromValues(192, 192, 192, 1.0)
+		);
+		this.m_rooms.push(
+			new Room(square, 0.05)
+		);*/
 		this.m_projectionMatrix = mat4.create();
-
+		this.grid = grid;
 		this.m_width = width;
 		this.m_height = height;
 		this.m_fieldOfViewDegree = fieldOfViewDegree;
@@ -113,6 +124,7 @@ export class Scene2D {
 		mat4.translate(this.m_modelViewMatrix,
 			this.m_modelViewMatrix,
 			[0.0, 0.0, translateZ]);
+
 	}
 
 
@@ -141,7 +153,7 @@ export class Scene2D {
 		//return new Point2D(winX, winY);
 	}
 
-	convert2DPointTo3DWorld(winx:number, winy:number): vec3 {
+	convert2DPointTo3DWorld(winx: number, winy: number): vec3 {
 
 		/*let projectionInverse= mat4.create();
 	   let multipliedMatrix = mat4.create();
@@ -199,7 +211,7 @@ export class Scene2D {
 		return vec3.fromValues(normalizedRayDirection[0]*5, normalizedRayDirection[1]*5, 0);
 	    
 		*/
-		
+
 		let imageAspectRatio = this.m_width / this.m_height; // width > height 
 		let Px = (2 * ((winx + 0.5) / this.m_width) - 1) * Math.tan(this.m_fieldOfViewDegree / 2 * Math.PI / 180) * this.m_aspectRatio;
 		let Py = (1 - 2 * ((winy + 0.5) / this.m_height)) * Math.tan(this.m_fieldOfViewDegree / 2 * Math.PI / 180);
@@ -226,9 +238,9 @@ export class Scene2D {
 		//world-be vagyunk, a modellre vissza kell alakítani
 		return vec3.fromValues(normalizedRayDirection[0] * 5, normalizedRayDirection[1] * 5, (normalizedRayDirection[2] * 5) + 5);
 		*/
-		
-		return vec3.fromValues(Px*5, Py*5, (-1)*5 + 5);
-	   
+
+		return vec3.fromValues(Px * 5, Py * 5, (-1) * 5 + 5);
+
 	}
 
 	getRayTo2DPoint(x, y): vec3[] {
@@ -298,6 +310,11 @@ export class Scene2D {
 	addTriangle(t: Triangle) {
 		this.m_triangles.push(t);
 	}
-
+	get isGrid(): boolean {
+		return this.grid;
+	}
+	set setGrid(grid: boolean) {
+		this.grid = grid;
+	}
 
 }
