@@ -44,7 +44,7 @@ module.exports = {
        }
      ]
    },
-   
+   devtool: 'inline-source-map',
    plugins: [
       new CleanWebpackPlugin(['dist']),
       new CopyWebpackPlugin([
