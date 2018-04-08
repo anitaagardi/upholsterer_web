@@ -10,52 +10,52 @@ export class Room {
 	private right_square: Square;
 	private line_size: number;
 	private m_squares: Square[] = [];
-	
+
 	constructor(square: Square, line_size: number) {
 		this.basic_square = square;
 		this.line_size = line_size;
 
-		let v1=vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1] + line_size, 0.0);
-		let v2=vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1], 0.0);
-		let v3=vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1] + line_size, 0.0);
-		let v4=vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1], 0.0);
-		let v5=vec4.fromValues(0.0, 0.0, 0.0, 1.0)
+		let v1 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1] + line_size, 0.0);
+		let v2 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1], 0.0);
+		let v3 = vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1] + line_size, 0.0);
+		let v4 = vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1], 0.0);
+		let v5 = vec4.fromValues(0.0, 0.0, 0.0, 1.0)
 
-		
+
 		this.upper_square = new Square();
-        this.upper_square.createFromVec(v1,v2,v3,v4,v5);
+		this.upper_square.createFromVec(v1, v2, v3, v4, v5);
 
-		v1=vec3.fromValues(square.rightLowerCoordinate[0] + line_size, square.rightLowerCoordinate[1], 0.0);
-		v2=vec3.fromValues(square.rightLowerCoordinate[0] + line_size, square.rightLowerCoordinate[1] - line_size, 0.0);
-		v3=vec3.fromValues(square.leftLowerCoordinate[0] - line_size, square.leftLowerCoordinate[1], 0.0);
-		v4=vec3.fromValues(square.leftLowerCoordinate[0] - line_size, square.leftLowerCoordinate[1] - line_size, 0.0);
-		v5=vec4.fromValues(0.0, 0.0, 0.0, 1.0)
+		v1 = vec3.fromValues(square.rightLowerCoordinate[0] + line_size, square.rightLowerCoordinate[1], 0.0);
+		v2 = vec3.fromValues(square.rightLowerCoordinate[0] + line_size, square.rightLowerCoordinate[1] - line_size, 0.0);
+		v3 = vec3.fromValues(square.leftLowerCoordinate[0] - line_size, square.leftLowerCoordinate[1], 0.0);
+		v4 = vec3.fromValues(square.leftLowerCoordinate[0] - line_size, square.leftLowerCoordinate[1] - line_size, 0.0);
+		v5 = vec4.fromValues(0.0, 0.0, 0.0, 1.0)
 
 		this.lower_square = new Square();
-		this.lower_square.createFromVec(v1,v2,v3,v4,v5);
+		this.lower_square.createFromVec(v1, v2, v3, v4, v5);
 
-		
-		v1=vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1] + line_size, 0.0);
-		v2=vec3.fromValues(square.leftUpperCoordinate[0], square.leftUpperCoordinate[1] + line_size, 0.0);
-		v3=vec3.fromValues(square.leftLowerCoordinate[0], square.leftLowerCoordinate[1] - line_size, 0.0);
-		v4=vec3.fromValues(square.leftLowerCoordinate[0] - line_size, square.leftLowerCoordinate[1] - line_size, 0.0);
-		v5=vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+
+		v1 = vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1] + line_size, 0.0);
+		v2 = vec3.fromValues(square.leftUpperCoordinate[0], square.leftUpperCoordinate[1] + line_size, 0.0);
+		v3 = vec3.fromValues(square.leftLowerCoordinate[0], square.leftLowerCoordinate[1] - line_size, 0.0);
+		v4 = vec3.fromValues(square.leftLowerCoordinate[0] - line_size, square.leftLowerCoordinate[1] - line_size, 0.0);
+		v5 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 
 		this.left_square = new Square(
 		);
 
-		this.left_square.createFromVec(v1,v2,v3,v4,v5);
+		this.left_square.createFromVec(v1, v2, v3, v4, v5);
 
-		v1=vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1] + line_size, 0.0);
-		v2=vec3.fromValues(square.rightUpperCoordinate[0], square.rightUpperCoordinate[1] + line_size, 0.0);
-		v3=vec3.fromValues(square.rightLowerCoordinate[0], square.rightLowerCoordinate[1] - line_size, 0.0);
-		v4=vec3.fromValues(square.rightLowerCoordinate[0] + line_size, square.rightLowerCoordinate[1] - line_size, 0.0);
-		v5=vec4.fromValues(0.0, 0.0, 0.0, 1.0);
+		v1 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1] + line_size, 0.0);
+		v2 = vec3.fromValues(square.rightUpperCoordinate[0], square.rightUpperCoordinate[1] + line_size, 0.0);
+		v3 = vec3.fromValues(square.rightLowerCoordinate[0], square.rightLowerCoordinate[1] - line_size, 0.0);
+		v4 = vec3.fromValues(square.rightLowerCoordinate[0] + line_size, square.rightLowerCoordinate[1] - line_size, 0.0);
+		v5 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 
 		this.right_square = new Square(
 		);
 
-		this.right_square.createFromVec(v1,v2,v3,v4,v5);
+		this.right_square.createFromVec(v1, v2, v3, v4, v5);
 	}
 	get squares(): Square[] {
 		this.m_squares[0] = this.basic_square;
@@ -63,12 +63,14 @@ export class Room {
 		this.m_squares[2] = this.lower_square;
 		this.m_squares[3] = this.left_square;
 		this.m_squares[4] = this.right_square;
+
+		
 		return this.m_squares;
 	}
-	contains(m_rooms:Room[]):boolean{
+	contains(m_rooms: Room[]): boolean {
 		console.log()
 
-		for(var i=0;i<m_rooms.length;i++){
+		/*for(var i=0;i<m_rooms.length;i++){
 			var count=0;
 			var widthThis=Math.abs(this.squares[1].leftUpperCoordinate[0]-this.squares[1].rightUpperCoordinate[0]);
 			var widthActual=Math.abs(m_rooms[i].squares[1].leftUpperCoordinate[0]-m_rooms[i].squares[1].rightUpperCoordinate[0]);
@@ -77,7 +79,7 @@ export class Room {
 				count=count+1;
 			}
 			var heightThis=Math.abs(this.squares[3].rightUpperCoordinate[1]-this.squares[3].rightLowerCoordinate[1]);
-			var heightActual=Math.abs(m_rooms[i].squares[3].rightUpperCoordinate[1]-this.squares[3].rightLowerCoordinate[1]);
+			var heightActual=Math.abs(m_rooms[i].squares[3].rightUpperCoordinate[1]-m_rooms[i].squares[3].rightLowerCoordinate[1]);
 			var comparableNumberHeight=Math.abs(this.squares[3].rightUpperCoordinate[1]-this.squares[3].rightLowerCoordinate[1]);
 			if(heightThis+widthActual>comparableNumberWidth){
 				count=count+1;
@@ -88,8 +90,26 @@ export class Room {
 			
 		}
 		return false;
+		*/
+
+		for (var i = 0; i < m_rooms.length; i++) {
+			if( !(this.squares[2].leftLowerCoordinate[0] >  m_rooms[i].squares[1].rightUpperCoordinate[0]
+				||  this.squares[1].rightUpperCoordinate[0] <  m_rooms[i].squares[2].leftLowerCoordinate[0]
+				||  this.squares[2].leftLowerCoordinate[1] >  m_rooms[i].squares[1].rightUpperCoordinate[1]
+				||  this.squares[1].rightUpperCoordinate[1] < m_rooms[i].squares[2].leftLowerCoordinate[1])) {
+
+					return true;
+				} else if(
+				 !(	m_rooms[i].squares[2].leftLowerCoordinate[0] >  this.squares[1].rightUpperCoordinate[0]
+				||  m_rooms[i].squares[1].rightUpperCoordinate[0] <  this.squares[2].leftLowerCoordinate[0]
+				||  m_rooms[i].squares[2].leftLowerCoordinate[1] >  this.squares[1].rightUpperCoordinate[1]
+				||  m_rooms[i].squares[1].rightUpperCoordinate[1] < this.squares[2].leftLowerCoordinate[1]
+
+				)) {
+					return true;
+				}
+			
+		}
+		return false;
 	}
-
-
-
 }

@@ -2,6 +2,9 @@ import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 import { Triangle } from './Triangle';
 import { Square } from './Square';
 import { Room } from './Room';
+
+import { Subject }  from 'rxjs/Subject';
+
 export class Scene2D {
 
 	private m_projectionMatrix: mat4;
@@ -23,85 +26,11 @@ export class Scene2D {
 	private m_rooms: Room[] = [];
 	private m_vertexCount = 3;
 
+	private roomSource = new Subject<any>();
+	public roomSource$ = this.roomSource.asObservable();
+
 	constructor(width, height, fieldOfViewDegree, zNear, zFar, translateZ, grid) {
 
-		/* this.m_triangles.push ( new Triangle(
-				vec3.fromValues(0.5, 0.5,0.0),
-				vec3.fromValues(-0.5,0.5,0.0),
-				vec3.fromValues( 0.5, -0.5,0.0),
-				vec4.fromValues( 1.0, 1.0,1.0,1.0),
-			   ) );*/
-		/*	   
-		  this.m_triangles.push ( new Triangle(
-				vec3.fromValues(-0.5, -0.5,0.0),
-				vec3.fromValues(-0.5,0.5,0.0),
-				vec3.fromValues( 0.5, -0.5,0.0)
-			   ) );
-		*/
-
-		/*this.m_squares.push(new Square(new Triangle(
-		 vec3.fromValues(0.5, 0.5,0.0),
-		 vec3.fromValues(-0.5,0.5,0.0),
-		 vec3.fromValues( 0.5, -0.5,0.0)
-		),new Triangle(
-		 vec3.fromValues(-0.5, -0.5,0.0),
-		 vec3.fromValues(-0.5,0.5,0.0),
-		 vec3.fromValues( 0.5, -0.5,0.0)
-		) ));*/
-		/* 
-		csak a négyszögek
-		this.m_squares.push(new Square(
-		  vec3.fromValues(0.5, 0.5,0.0),
-		  vec3.fromValues(-0.5,0.5,0.0),
-		  vec3.fromValues( 0.5, -0.5,0.0),
-		  vec3.fromValues(-0.5, -0.5,0.0)
-		 ));
-		 
-		 this.m_squares.push(new Square(
-		  vec3.fromValues(1, 1,0.0),
-		  vec3.fromValues(2,2,0.0),
-		  vec3.fromValues( 2, 1,0.0),
-		  vec3.fromValues(1, 2,0.0)
-		 ));*/
-
-		/*
-		let square = new Square();
-
-		square.createFromVec(
-		   vec3.fromValues(10, 10, 0.0),
-		   vec3.fromValues(110, 110, 0.0),
-		   vec3.fromValues(110, 10, 0.0),
-		   vec3.fromValues(10, 110, 0.0),
-		   vec4.fromValues(192, 192, 192, 1.0)
-		);
-
-	   this.m_rooms.push(new Room(square, 0.05));*/
-
-
-		/*this.m_triangles.push ( new Triangle(
-			  vec3.fromValues(2.5, 0.5,0.0),
-			  vec3.fromValues(1.5,0.5,0.0),
-			  vec3.fromValues( 2.5, -0.5,0.0)
-			 ) );
-	    
-		this.m_triangles.push ( new Triangle(
-			  vec3.fromValues(-4, -2.5,0.0),
-			  vec3.fromValues(-2,-2.5,0.0),
-			  vec3.fromValues( -4, 2.5,0.0)
-			 ) );*/
-
-			 ///EZ KELL MAJD!!!
-		/*let square = new Square();
-		square.createFromVec(
-			this.convert2DPointTo3DWorld(0, 0),
-			this.convert2DPointTo3DWorld(200, 0),
-			this.convert2DPointTo3DWorld(0, 200),
-			this.convert2DPointTo3DWorld(200, 200),
-			vec4.fromValues(192, 192, 192, 1.0)
-		);
-		this.m_rooms.push(
-			new Room(square, 0.05)
-		);*/
 		this.m_projectionMatrix = mat4.create();
 		this.grid = grid;
 		this.m_width = width;
@@ -279,6 +208,11 @@ export class Scene2D {
 
 		return [rayOrigin, normalizedRayDirection];
 	}
+	
+	addRoom(room: Room) {
+		this.m_rooms.push(room);
+		this.roomSource.next();
+	}
 
 	get projectionMatrix(): mat4 {
 		return this.m_projectionMatrix;
@@ -307,9 +241,6 @@ export class Scene2D {
 		return this.m_rooms;
 	}
 
-	addTriangle(t: Triangle) {
-		this.m_triangles.push(t);
-	}
 	get isGrid(): boolean {
 		return this.grid;
 	}

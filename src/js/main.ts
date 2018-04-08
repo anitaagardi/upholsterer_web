@@ -15,7 +15,9 @@ let main = new Main('#glcanvas', vertexShaderSource, fragmentShaderSource);
 
 let points: vec3[] = [];
 
-main.drawScene(scene2D);
+//main.drawScene(scene2D);
+main.setScene(scene2D);
+main.drawScene();
 
 let addNewRoomHTMLInput = (<HTMLInputElement>document.getElementById("addNewRoom"));
 
@@ -76,18 +78,18 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	);
 	
 	if(!(new Room(square, 0.05).contains(scene2D.rooms))){
-		scene2D.rooms.push(new Room(square, 0.05));
+		//scene2D.rooms.push(new Room(square, 0.05));
+		scene2D.addRoom(new Room(square, 0.05));
 	}
 	//scene2D.rooms.push(new Room(square, 0.05));
 
-	main.drawScene(scene2D);
+	//main.drawScene(scene2D);
 });
 
 
 main.subscribeClick((x, y) => {
-	console.log(x + " " + y);
-
-	let point = scene2D.convert2DPointTo3DWorld(x, y);
+	
+	/*let point = scene2D.convert2DPointTo3DWorld(x, y);
 
 	if (points.length < 3) {
 		points.push(point);
@@ -105,7 +107,7 @@ main.subscribeClick((x, y) => {
 		scene2D.addTriangle(t);
 
 		main.drawScene(scene2D);
-	}
+	}*/
 
 	let [p, d] = scene2D.getRayTo2DPoint(x, y);
 

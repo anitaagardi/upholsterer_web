@@ -1,4 +1,6 @@
 import { Scene2D } from './Scene2D';
+import { Subscription } from 'rxjs/Subscription';
+
 
 interface ClickCallback {
 	(x, y): void;
@@ -8,6 +10,8 @@ export class Main {
 
 	private canvas: HTMLCanvasElement;
 	private gl: WebGL2RenderingContext;
+	private scene:Scene2D;
+	private sceneSubscription: Subscription;
 
 	private shaderProgram;
 
@@ -40,6 +44,19 @@ export class Main {
 
 	}
 
+	setScene=(scene:Scene2D)=> {
+		if(this.scene) {
+			this.sceneSubscription.unsubscribe();
+		}
+		this.scene = scene;
+		this.sceneSubscription = this.scene.roomSource$.subscribe(
+			()=>{
+				console.log("Itt");
+				this.drawScene();
+			}
+		)
+	};
+
 	//TODO: szín legyen opcionális
 	initBuffers(positions, colors) {
 
@@ -63,7 +80,12 @@ export class Main {
 		};
 	}
 
-	drawScene(scene: Scene2D) {
+	drawScene(scene?: Scene2D) {
+
+		if(!scene) {
+			scene=this.scene;
+		}
+
 		//TODO: new color
 		//this.gl.clearColor(0, 0, 255, 0.3);
 		this.gl.clearColor(0.5, 0.5, 0.5, 0.9);
