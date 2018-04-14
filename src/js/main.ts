@@ -22,6 +22,7 @@ main.drawScene();
 let addNewRoomHTMLInput = (<HTMLInputElement>document.getElementById("addNewRoom"));
 
 addNewRoomHTMLInput.addEventListener("click", (event) => {
+	event.preventDefault();
 	console.log("addnewRoom");
 	let roomUpperLeftX: number = parseInt((<HTMLInputElement>document.getElementById("roomUpperLeftX")).value);
 	let roomUpperLeftY: number =  parseInt((<HTMLInputElement>document.getElementById("roomUpperLeftY")).value);
@@ -89,25 +90,7 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 
 main.subscribeClick((x, y) => {
 	
-	/*let point = scene2D.convert2DPointTo3DWorld(x, y);
-
-	if (points.length < 3) {
-		points.push(point);
-	}
-
-	if (points.length == 3) {
-
-		let t = new Triangle(
-			points[0],
-			points[1],
-			points[2],
-			vec4.fromValues(1.0, 1.0, 1.0, 1.0),
-		);
-
-		scene2D.addTriangle(t);
-
-		main.drawScene(scene2D);
-	}*/
+	console.log(x + " " + y);
 
 	let [p, d] = scene2D.getRayTo2DPoint(x, y);
 
@@ -131,6 +114,6 @@ main.subscribeClick((x, y) => {
 	}
 	//main.drawGrids();
 
-	//alert(result);
+	alert(result);
 });
 

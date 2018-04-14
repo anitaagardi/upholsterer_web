@@ -1,18 +1,36 @@
 <html>
+
 <head>
+	<link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
+
 <body>
-<canvas id="glCanvas" width="1000" height="800"></canvas>
-<form>
-Új szoba létrehozása: </br>
-	Bal felső X koordináta: <input type="number" id="roomUpperLeftX"></input></br>
-	Bal felső Y koordináta: <input type="number" id="roomUpperLeftY"></input></br>
-	Szélesség: <input type="number" id="roomWidth"></input></br>
-	Magasság: <input type="number" id="roomHeight"></input></br>
-	<input type="button" id="addNewRoom"> Szoba hozzáadása </input>
-</form>
-
-<script src="js/main.js"></script>
-
+	<div class="banner"></div>
+	<div class="editor">
+		<div class="container">
+			<canvas id="glCanvas" width="1000" height="800"></canvas>
+			<canvas id="text"  width="1000" height="800"></canvas>
+		</div>
+		<div>
+			<div>Új szoba létrehozása:</div>
+			<form>
+				<div>Bal felső X koordináta:
+					<input type="number" id="roomUpperLeftX" />
+				</div>
+				<div>Bal felső Y koordináta:
+					<input type="number" id="roomUpperLeftY" />
+				</div>
+				<div>Szélesség:
+					<input type="number" id="roomWidth" />
+				</div>
+				<div>Magasság:
+					<input type="number" id="roomHeight" />
+				</div>
+				<button id="addNewRoom"> Szoba hozzáadása </button>
+			</form>
+		</div>
+	</div>
+	<script src="js/main.js"></script>
 </body>
+
 </html>

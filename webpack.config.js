@@ -51,7 +51,13 @@ module.exports = {
 			{ 
 			    from: 'src/index.html',
 				to: '.'
-			}/*,
+      },
+
+      { 
+        from: 'src/css/main.css',
+        to: './css/main.css'
+      }
+        /*,
 			
 			{ 
 			    from: 'src/js/utils/gl-matrix.js',
