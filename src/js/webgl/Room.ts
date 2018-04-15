@@ -10,11 +10,11 @@ export class Room {
 	private right_square: Square;
 	private line_size: number;
 	private m_squares: Square[] = [];
-
-	constructor(square: Square, line_size: number) {
+	private room_Name: string;
+	constructor(square: Square, line_size: number,roomName:string) {
 		this.basic_square = square;
 		this.line_size = line_size;
-
+		this.room_Name=roomName;
 		let v1 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1] + line_size, 0.0);
 		let v2 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1], 0.0);
 		let v3 = vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1] + line_size, 0.0);
@@ -66,6 +66,9 @@ export class Room {
 
 		
 		return this.m_squares;
+	}
+	get roomName():String{
+		return this.room_Name;
 	}
 	contains(m_rooms: Room[]): boolean {
 		console.log()

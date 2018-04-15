@@ -1,3 +1,4 @@
+import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 import { Scene2D } from './Scene2D';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -21,7 +22,7 @@ export class Main {
 		fragmentShaderSource: string) {
 
 		this.canvas = document.querySelector(htmlCanvasElementId);
-		this.gl = this.canvas.getContext('webgl2');
+		this.gl = this.canvas.getContext('webgl2') as WebGL2RenderingContext;
 
 		if (!this.gl) {
 			alert('Unable to initialize WebGL. Your browser or machine may not support it.');
@@ -177,9 +178,31 @@ export class Main {
 
 		this.gl.drawArrays(this.gl.LINES, 0, colors.length / 4);
 
+		
+		// look up the text canvas.
+	    let textCanvas:HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
+		
+		// make a 2D context for it
+		var ctx = textCanvas.getContext("2d");
 
+		ctx.font="30px Arial";
+		console.log("Meret "+  ctx.canvas.width + " " +  ctx.canvas.height);
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		
 
 		for (let i = 0; i < scene.rooms.length; i++) {
+			
+			let screenPointFrom=scene.convert3DPointToScreen(
+				vec4.fromValues(scene.rooms[i].squares[0].leftUpperCoordinate[0],scene.rooms[i].squares[0].leftUpperCoordinate[1]
+				,scene.rooms[i].squares[0].leftUpperCoordinate[2],1.0));
+			
+				let screenPointTo=scene.convert3DPointToScreen(
+					vec4.fromValues(scene.rooms[i].squares[0].rightLowerCoordinate[0],scene.rooms[i].squares[0].rightLowerCoordinate[1]
+					,scene.rooms[i].squares[0].rightLowerCoordinate[2],1.0));
+		    console.log("E " + screenPointFrom[0] + " " + screenPointFrom[1]);
+
+			ctx.fillText(scene.rooms[i].roomName+"", (screenPointFrom[0]+screenPointTo[0])/2, (screenPointFrom[1]+screenPointTo[1])/2);
+			
 			for (let j = 0; j < scene.rooms[i].squares.length; j++) {
 				for (let k = 0; k < scene.rooms[i].squares[j].triangles.length; k++) {
 
@@ -303,18 +326,7 @@ export class Main {
 
 			//rács rajzolás
 
-		// look up the text canvas.
-	    let textCanvas:HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
-		
-		// make a 2D context for it
-		var ctx = textCanvas.getContext("2d");
-		ctx.fillText("PELDS", 100, 100);
-
 		}
-
-		
-
-
 
 	}
 

@@ -57,7 +57,7 @@ export class Scene2D {
 	}
 
 
-	convert3DPointToScreen(point: vec4) {
+	convert3DPointToScreen(point: vec4):number[] {
 
 		let multipliedMatrix = mat4.create();
 		mat4.multiply(multipliedMatrix, this.m_projectionMatrix, this.m_modelViewMatrix);
@@ -76,8 +76,9 @@ export class Scene2D {
 		let winY = Math.round(((1 - screenPoint[1] / screenPoint[3]) / 2.0) *
 			this.m_height);
 
-		console.log("Vissza " + winX + " " + winY);
+		//console.log("Vissza " + winX + " " + winY);
 
+		return [winX, winY];
 
 		//return new Point2D(winX, winY);
 	}

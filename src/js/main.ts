@@ -28,7 +28,7 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	let roomUpperLeftY: number =  parseInt((<HTMLInputElement>document.getElementById("roomUpperLeftY")).value);
 	let roomWidth: number =  parseInt((<HTMLInputElement>document.getElementById("roomWidth")).value);
 	let roomHeight: number =  parseInt((<HTMLInputElement>document.getElementById("roomHeight")).value);
-
+	let roomName:string= (<HTMLInputElement>document.getElementById("roomName")).value;
 	console.log((roomUpperLeftX +roomWidth));
     console.log((roomUpperLeftY + roomHeight));
 	
@@ -78,9 +78,9 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	    vec4.fromValues(192, 192, 192, 1.0)
 	);
 	
-	if(!(new Room(square, 0.05).contains(scene2D.rooms))){
+	if(!(new Room(square, 0.05,roomName).contains(scene2D.rooms))){
 		//scene2D.rooms.push(new Room(square, 0.05));
-		scene2D.addRoom(new Room(square, 0.05));
+		scene2D.addRoom(new Room(square, 0.05,roomName));
 	}
 	//scene2D.rooms.push(new Room(square, 0.05));
 
