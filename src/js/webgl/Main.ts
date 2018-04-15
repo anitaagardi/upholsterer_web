@@ -88,7 +88,8 @@ export class Main {
 
 		//TODO: new color
 		//this.gl.clearColor(0, 0, 255, 0.3);
-		this.gl.clearColor(0.5, 0.5, 0.5, 0.9);
+		//this.gl.clearColor(1, 1, 1, 0);
+		this.gl.clearColor(247/255, 244/255, 244/255, 0.9);
 		this.gl.clearDepth(1.0);
 		this.gl.enable(this.gl.DEPTH_TEST);
 		this.gl.depthFunc(this.gl.LEQUAL);
@@ -99,7 +100,7 @@ export class Main {
 		var vertices = [];
 		for (var i = 0; i < 2000; i = i + 50) {
 			//függőleges
-			colors = colors.concat([38.0, 38.0, 38.0, 1.0]);
+			colors = colors.concat([0, 0, 0, 0.0]);
 
 
 
@@ -109,7 +110,7 @@ export class Main {
 			v = scene.convert2DPointTo3DWorld(i, 800);
 			vertices = vertices.concat([v[0], v[1], v[2]]);
 			//vízszintes
-			colors = colors.concat([38.0, 38.0, 38.0, 1.0]);
+			colors = colors.concat([0, 0, 0, 0.0]);
 
 
 
@@ -300,9 +301,19 @@ export class Main {
 				this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
 			}
 
+			//rács rajzolás
+
+		// look up the text canvas.
+	    let textCanvas:HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
+		
+		// make a 2D context for it
+		var ctx = textCanvas.getContext("2d");
+		ctx.fillText("PELDS", 100, 100);
+
 		}
 
-		//rács rajzolás
+		
+
 
 
 	}
@@ -352,6 +363,7 @@ export class Main {
 			clickCallback(x, y);
 		}, false);
 	}
+	/*
 	drawGrids() {
 		var vertices = [
 			-0.7, -0.1, 0,
@@ -374,11 +386,11 @@ export class Main {
 		// Enable the attribute
 		this.gl.enableVertexAttribArray(coord);
 
-		/*============ Drawing the triangle =============*/
+	
 
 		// Clear the canvas
-		this.gl.clearColor(0.5, 0.5, 0.5, 0.9);
-
+		//this.gl.clearColor(0.5, 0.5, 0.5, 0.9);
+		this.gl.clearColor(247/255, 244/255, 244/255, 0.9);
 		// Enable the depth test
 		this.gl.enable(this.gl.DEPTH_TEST);
 
@@ -391,5 +403,5 @@ export class Main {
 		// Draw the triangle
 		this.gl.drawArrays(this.gl.LINES, 0, 6);
 	}
-
+     */
 }
