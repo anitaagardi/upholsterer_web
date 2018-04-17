@@ -186,6 +186,9 @@ export class Main {
 		var ctx = textCanvas.getContext("2d");
 
 		ctx.font="30px Arial";
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'top';
+		
 		console.log("Meret "+  ctx.canvas.width + " " +  ctx.canvas.height);
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 		
@@ -196,7 +199,7 @@ export class Main {
 				vec4.fromValues(scene.rooms[i].squares[0].leftUpperCoordinate[0],scene.rooms[i].squares[0].leftUpperCoordinate[1]
 				,scene.rooms[i].squares[0].leftUpperCoordinate[2],1.0));
 			
-				let screenPointTo=scene.convert3DPointToScreen(
+			let screenPointTo=scene.convert3DPointToScreen(
 					vec4.fromValues(scene.rooms[i].squares[0].rightLowerCoordinate[0],scene.rooms[i].squares[0].rightLowerCoordinate[1]
 					,scene.rooms[i].squares[0].rightLowerCoordinate[2],1.0));
 		    console.log("E " + screenPointFrom[0] + " " + screenPointFrom[1]);
