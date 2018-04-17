@@ -29,6 +29,7 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	let roomWidth: number =  parseInt((<HTMLInputElement>document.getElementById("roomWidth")).value);
 	let roomHeight: number =  parseInt((<HTMLInputElement>document.getElementById("roomHeight")).value);
 	let roomName:string= (<HTMLInputElement>document.getElementById("roomName")).value;
+	let roomBorder:number=Number((<HTMLInputElement>document.getElementById("roomBorder")).value);
 	console.log((roomUpperLeftX +roomWidth));
     console.log((roomUpperLeftY + roomHeight));
 	
@@ -71,16 +72,17 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	);	*/
 	
 	square.createFromVec( 
-		scene2D.convert2DPointTo3DWorld(roomUpperLeftX, roomUpperLeftY),
-		scene2D.convert2DPointTo3DWorld(roomUpperLeftX +roomWidth, roomUpperLeftY),
-		scene2D.convert2DPointTo3DWorld(roomUpperLeftX, roomUpperLeftY + roomHeight),
-        scene2D.convert2DPointTo3DWorld(roomUpperLeftX +roomWidth, roomUpperLeftY + roomHeight),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX-roomBorder, roomUpperLeftY-roomBorder),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX +roomWidth-roomBorder, roomUpperLeftY-roomBorder),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX-roomBorder, roomUpperLeftY + roomHeight-roomBorder),
+        scene2D.convert2DPointTo3DWorld(roomUpperLeftX +roomWidth-roomBorder, roomUpperLeftY + roomHeight-roomBorder),
 	    vec4.fromValues(192, 192, 192, 1.0)
 	);
 	
-	if(!(new Room(square, 0.05,roomName).contains(scene2D.rooms))){
+	if(!(new Room(square, roomBorder,roomName).contains(scene2D.rooms))){
 		//scene2D.rooms.push(new Room(square, 0.05));
-		scene2D.addRoom(new Room(square, 0.05,roomName));
+		//console.log(roomBorder+1 +" border");
+		scene2D.addRoom(new Room(square, roomBorder,roomName));
 	}
 	//scene2D.rooms.push(new Room(square, 0.05));
 
