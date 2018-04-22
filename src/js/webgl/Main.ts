@@ -1,7 +1,9 @@
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 import { Scene2D } from './Scene2D';
+import { Scene3D } from './Scene3D';
 import { Subscription } from 'rxjs/Subscription';
 
+import { Scene } from './Scene';
 
 interface ClickCallback {
 	(x, y): void;
@@ -11,7 +13,7 @@ export class Main {
 
 	private canvas: HTMLCanvasElement;
 	private gl: WebGL2RenderingContext;
-	private scene:Scene2D;
+	private scene: Scene;
 	private sceneSubscription: Subscription;
 
 	private shaderProgram;
@@ -45,13 +47,13 @@ export class Main {
 
 	}
 
-	setScene=(scene:Scene2D)=> {
-		if(this.scene) {
+	setScene = (scene: Scene) => {
+		if (this.scene) {
 			this.sceneSubscription.unsubscribe();
 		}
 		this.scene = scene;
 		this.sceneSubscription = this.scene.roomSource$.subscribe(
-			()=>{
+			() => {
 				console.log("Itt");
 				this.drawScene();
 			}
@@ -81,23 +83,23 @@ export class Main {
 		};
 	}
 
-	drawScene(scene?: Scene2D) {
+	drawScene(scene?: Scene) {
 
-		if(!scene) {
-			scene=this.scene;
+		if (!scene) {
+			scene = this.scene;
 		}
 
 		//TODO: new color
 		//this.gl.clearColor(0, 0, 255, 0.3);
-		//this.gl.clearColor(1, 1, 1, 0);
-		this.gl.clearColor(247/255, 244/255, 244/255, 0.9);
+		this.gl.clearColor(1, 1, 1, 0.9);
+		//this.gl.clearColor(247 / 255, 244 / 255, 244 / 255, 0.9);
 		this.gl.clearDepth(1.0);
 		this.gl.enable(this.gl.DEPTH_TEST);
 		this.gl.depthFunc(this.gl.LEQUAL);
 
 
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-		var colors = [];
+		/*var colors = [];
 		var vertices = [];
 		for (var i = 0; i < 2000; i = i + 50) {
 			//függőleges
@@ -122,90 +124,99 @@ export class Main {
 			vertices = vertices.concat([v[0], v[1], v[2]]);
 
 
+		}*/
+
+		let grid = scene.getGrid();
+
+		if (grid) {
+
+			let buffers = this.initBuffers(grid[0], grid[1]);
+
+			{
+				const numComponents = 3;
+				const type = this.gl.FLOAT;
+				const normalize = false;
+				const stride = 0;
+				const offset = 0;
+
+				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+				this.gl.vertexAttribPointer(
+					this.programInfo.attribLocations.vertexPosition,
+					numComponents,
+					type,
+					normalize,
+					stride,
+					offset);
+				this.gl.enableVertexAttribArray(
+					this.programInfo.attribLocations.vertexPosition);
+			}
+
+			{
+				const numComponents = 4;
+				const type = this.gl.FLOAT;
+				const normalize = false;
+				const stride = 0;
+				const offset = 0;
+				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+				this.gl.vertexAttribPointer(
+					this.programInfo.attribLocations.vertexColor,
+					numComponents,
+					type,
+					normalize,
+					stride,
+					offset);
+				this.gl.enableVertexAttribArray(
+					this.programInfo.attribLocations.vertexColor);
+			}
+
+
+			//TODO: useProgram-t nem biztos, hogy mindig meg kellene hívni
+			this.gl.useProgram(this.programInfo.program);
+
+			this.gl.uniformMatrix4fv(
+				this.programInfo.uniformLocations.projectionMatrix,
+				false,
+				scene.projectionMatrix);
+			this.gl.uniformMatrix4fv(
+				this.programInfo.uniformLocations.modelViewMatrix,
+				false,
+				scene.modelViewMatrix);
+
+
+			//this.gl.drawArrays(this.gl.LINES, 0, grid[1].length / 4);
+
+			this.gl.drawArrays(this.gl.LINES, 0, grid[0].length/3);
+
 		}
-		let buffers = this.initBuffers(vertices, colors);
-
-		{
-			const numComponents = 3;
-			const type = this.gl.FLOAT;
-			const normalize = false;
-			const stride = 0;
-			const offset = 0;
-
-			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-			this.gl.vertexAttribPointer(
-				this.programInfo.attribLocations.vertexPosition,
-				numComponents,
-				type,
-				normalize,
-				stride,
-				offset);
-			this.gl.enableVertexAttribArray(
-				this.programInfo.attribLocations.vertexPosition);
-		}
-
-		{
-			const numComponents = 4;
-			const type = this.gl.FLOAT;
-			const normalize = false;
-			const stride = 0;
-			const offset = 0;
-			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
-			this.gl.vertexAttribPointer(
-				this.programInfo.attribLocations.vertexColor,
-				numComponents,
-				type,
-				normalize,
-				stride,
-				offset);
-			this.gl.enableVertexAttribArray(
-				this.programInfo.attribLocations.vertexColor);
-		}
 
 
-		//TODO: useProgram-t nem biztos, hogy mindig meg kellene hívni
-		this.gl.useProgram(this.programInfo.program);
-
-		this.gl.uniformMatrix4fv(
-			this.programInfo.uniformLocations.projectionMatrix,
-			false,
-			scene.projectionMatrix);
-		this.gl.uniformMatrix4fv(
-			this.programInfo.uniformLocations.modelViewMatrix,
-			false,
-			scene.modelViewMatrix);
-
-
-		this.gl.drawArrays(this.gl.LINES, 0, colors.length / 4);
-
-		
 		// look up the text canvas.
-	    let textCanvas:HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
-		
+		let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
+
 		// make a 2D context for it
 		var ctx = textCanvas.getContext("2d");
 
-		ctx.font="30px Arial";
+		ctx.font = "30px Arial";
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'top';
-		
-		console.log("Meret "+  ctx.canvas.width + " " +  ctx.canvas.height);
+
+		console.log("Meret " + ctx.canvas.width + " " + ctx.canvas.height);
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-		
+
 
 		for (let i = 0; i < scene.rooms.length; i++) {
-			
-			let screenPointFrom=scene.convert3DPointToScreen(
-				vec4.fromValues(scene.rooms[i].squares[0].leftUpperCoordinate[0],scene.rooms[i].squares[0].leftUpperCoordinate[1]
-				,scene.rooms[i].squares[0].leftUpperCoordinate[2],1.0));
-			
-			let screenPointTo=scene.convert3DPointToScreen(
-					vec4.fromValues(scene.rooms[i].squares[0].rightLowerCoordinate[0],scene.rooms[i].squares[0].rightLowerCoordinate[1]
-					,scene.rooms[i].squares[0].rightLowerCoordinate[2],1.0));
-		    console.log("E " + screenPointFrom[0] + " " + screenPointFrom[1]);
 
-			ctx.fillText(scene.rooms[i].roomName+"", (screenPointFrom[0]+screenPointTo[0])/2, (screenPointFrom[1]+screenPointTo[1])/2);
-			
+			let screenPointFrom = scene.convert3DPointToScreen(
+				vec4.fromValues(scene.rooms[i].squares[0].leftUpperCoordinate[0], scene.rooms[i].squares[0].leftUpperCoordinate[1]
+					, scene.rooms[i].squares[0].leftUpperCoordinate[2], 1.0));
+
+			let screenPointTo = scene.convert3DPointToScreen(
+				vec4.fromValues(scene.rooms[i].squares[0].rightLowerCoordinate[0], scene.rooms[i].squares[0].rightLowerCoordinate[1]
+					, scene.rooms[i].squares[0].rightLowerCoordinate[2], 1.0));
+			console.log("E " + screenPointFrom[0] + " " + screenPointFrom[1]);
+
+			ctx.fillText(scene.rooms[i].roomName + "", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 2);
+
 			for (let j = 0; j < scene.rooms[i].squares.length; j++) {
 				for (let k = 0; k < scene.rooms[i].squares[j].triangles.length; k++) {
 
