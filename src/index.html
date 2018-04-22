@@ -6,17 +6,19 @@
 
 <body>
 	<div class="banner">
-		<h1>Lakberendező alkalmazás</h1>
-
+		<ul>
+			<li class="active" style="padding: 5px 250px;font-size: 40px">Lakberendező alkalmazás</li>
+			<li> 2D alaprajz </li>
+			<li> 3D alaprajz </li>
+		</ul>
 	</div>
 	<div class="editor">
 		<div class="container">
 			<canvas id="glCanvas" width="1000" height="800"></canvas>
-			<canvas id="text"  width="1000" height="800"></canvas>
+			<canvas id="text" width="1000" height="800"></canvas>
 		</div>
 		<div>
-				<button> 2D alaprajz </button>
-				<button> 3D alaprajz </button>
+
 
 			<h3 class="formText">Új szoba létrehozása:</h3>
 			<form>
@@ -24,7 +26,7 @@
 					<input type="number" id="roomUpperLeftX" placeholder="Bal felső X koordináta:" />
 				</div>
 				<div>
-					<input type="number" id="roomUpperLeftY" placeholder="Bal felső Y koordináta:"/>
+					<input type="number" id="roomUpperLeftY" placeholder="Bal felső Y koordináta:" />
 				</div>
 				<div>
 					<input type="number" id="roomWidth" placeholder="Szélesség:" />
@@ -38,7 +40,7 @@
 				<div>
 					<input type="text" id="roomName" placeholder="Szoba neve:" />
 				</div>
-				
+
 				<button id="addNewRoom"> Szoba hozzáadása </button>
 			</form>
 		</div>
