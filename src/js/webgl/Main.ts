@@ -196,7 +196,7 @@ export class Main {
 		// make a 2D context for it
 		var ctx = textCanvas.getContext("2d");
 
-		ctx.font = "30px Arial";
+		ctx.font = "15px Arial";
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'top';
 
@@ -215,7 +215,9 @@ export class Main {
 					, scene.rooms[i].squares[0].rightLowerCoordinate[2], 1.0));
 			console.log("E " + screenPointFrom[0] + " " + screenPointFrom[1]);
 
-			ctx.fillText(scene.rooms[i].roomName + "", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 2);
+			ctx.fillText(scene.rooms[i].roomName + "", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 3);
+			
+			ctx.fillText(scene.rooms[i].squareMeter+" m2 ",(screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 2);
 
 			for (let j = 0; j < scene.rooms[i].squares.length; j++) {
 				for (let k = 0; k < scene.rooms[i].squares[j].triangles.length; k++) {

@@ -11,7 +11,7 @@ function clickCanvas(event) {
 	
 	
 	let x = 2.0 * point.x / canvas.width - 1;
-    let y = - 2.0 * point.y / canvas.height + 1;
+  let y = - 2.0 * point.y / canvas.height + 1;
 	
 
 	let multipliedMatrix = mat4.create();
