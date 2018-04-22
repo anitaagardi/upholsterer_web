@@ -11,7 +11,7 @@ import { vertexShaderSource } from './webgl/shaders/vertex';
 
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 
-let scene2D = new Scene2D(1000, 800, 45, 0.1, 100,5,true);
+let scene2D = new Scene2D(1000, 800, 45, 0.1, 100,-5,true);
 let main = new Main('#glcanvas', vertexShaderSource, fragmentShaderSource);
 
 let points: vec3[] = [];
