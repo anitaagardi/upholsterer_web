@@ -1,5 +1,6 @@
 import { Main } from './webgl/Main';
 import { Scene2D } from './webgl/Scene2D';
+import { Scene3D } from './webgl/Scene3D';
 import { Triangle } from './webgl/Triangle';
 import { Square } from './webgl/Square';
 import { Room } from './webgl/Room';
@@ -10,12 +11,16 @@ import { vertexShaderSource } from './webgl/shaders/vertex';
 
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 
-let scene2D = new Scene2D(1000, 800, 45, 0.1, 100, -5.0,true);
+let scene2D = new Scene3D(1000, 800, 45, 0.1, 100,0,true);
 let main = new Main('#glcanvas', vertexShaderSource, fragmentShaderSource);
 
 let points: vec3[] = [];
 
+//let scene3D = new Scene3D(1000, 800, 45, 0.1, 100, -5.0,true);
 //main.drawScene(scene2D);
+
+//scene2D.lookAt(vec3.fromValues(0,10,-100), vec3.fromValues(0,0,1), vec3.fromValues(0,1,0));
+scene2D.lookAt(vec3.fromValues(0,0,0), vec3.fromValues(0,0,-1), vec3.fromValues(0,1,0));
 main.setScene(scene2D);
 main.drawScene();
 

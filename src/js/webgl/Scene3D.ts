@@ -2,19 +2,26 @@ import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 import { Triangle } from './Triangle';
 import { Square } from './Square';
 import { Room } from './Room';
-
 import { Scene } from './Scene';
 
-import { Subject }  from 'rxjs/Subject';
+import { Subject } from 'rxjs/Subject';
 
-export class Scene2D implements Scene {
+export class Scene3D implements Scene {
 
 	private m_projectionMatrix: mat4;
 	private m_modelViewMatrix: mat4;
+	private m_viewMatrix: mat4;
+
 	private m_width;
 	private m_height;
 	private m_fieldOfViewDegree;
+	private m_fieldOfViewRadian;
 	private m_aspectRatio;
+
+	private m_zNear;
+	private m_zFar;
+
+
 	private grid: boolean;
 	private m_positions = [
 		0.5, 0.5, 0.0,
@@ -39,9 +46,13 @@ export class Scene2D implements Scene {
 		this.m_height = height;
 		this.m_fieldOfViewDegree = fieldOfViewDegree;
 
-		let fieldOfViewRadian = fieldOfViewDegree * Math.PI / 180;
-		let aspect = width / height;
+		this.m_zNear = zNear;
+		this.m_zFar = zFar;
 
+		let fieldOfViewRadian = fieldOfViewDegree * Math.PI / 180;
+		this.m_fieldOfViewRadian = fieldOfViewRadian;
+
+		let aspect = width / height;
 		this.m_aspectRatio = aspect;
 
 		mat4.perspective(this.m_projectionMatrix,
@@ -56,10 +67,28 @@ export class Scene2D implements Scene {
 			this.m_modelViewMatrix,
 			[0.0, 0.0, translateZ]);
 
+
+
+		//fbr = fc - (up * Hfar/2) + (right * Wfar/2)
+
+		//fc = p + d * farDist
+		//fbl = fc - (up * Hfar/2) - (right * Wfar/2)
 	}
 
+	//lookAt(out, eye, center, up)
+	lookAt(eye: vec3, center: vec3, up: vec3) {
+		let cameraMatrix = mat4.create();
+		mat4.lookAt(cameraMatrix, eye, center, up);
 
-	convert3DPointToScreen(point: vec4):number[] {
+		this.m_viewMatrix = mat4.create();
+		mat4.invert(this.m_viewMatrix, cameraMatrix);
+
+		//this.m_viewMatrix = cameraMatrix;
+
+		mat4.multiply(this.m_modelViewMatrix, this.m_viewMatrix, this.m_modelViewMatrix);
+	}
+
+	convert3DPointToScreen(point: vec4): number[] {
 
 		let multipliedMatrix = mat4.create();
 		mat4.multiply(multipliedMatrix, this.m_projectionMatrix, this.m_modelViewMatrix);
@@ -211,7 +240,7 @@ export class Scene2D implements Scene {
 
 		return [rayOrigin, normalizedRayDirection];
 	}
-	
+
 	addRoom(room: Room) {
 		this.m_rooms.push(room);
 		this.roomSource.next();
@@ -251,35 +280,104 @@ export class Scene2D implements Scene {
 		this.grid = grid;
 	}
 
-	getGrid():any {
+	getGrid(): any {
+
+   	    let frustumHeight = 2.0 * this.m_zFar * Math.tan(this.m_fieldOfViewRadian * 0.5);
+		let frustumWidth = frustumHeight * this.m_aspectRatio;
+
+		console.log(frustumWidth + " " + frustumHeight);
+
+		let p = vec3.fromValues(0, 0, 0);
+		let d = vec3.fromValues(0, 0, -1);
+		let up = vec3.fromValues(0, 1, 0);
+		let right = vec3.fromValues(1, 0, 0);
+
+		let fc = vec3.create();
+		vec3.scale(d, d, this.m_zFar);
+		vec3.add(fc, p, d);
+
+		vec3.scale(up, up, frustumHeight / 2);
+		vec3.scale(right, right, frustumWidth / 2);
+
+		let diff = vec3.create();
+		vec3.subtract(diff, fc, up);
+
+		let fbl = vec3.create();
+
+		vec3.subtract(fbl, diff, right);
+
+		console.log(fbl);
+
+		let fbr = vec3.create();
+		vec3.add(fbr, diff, right);
+
+		console.log(fbr);
+
+		frustumHeight = 2.0 * this.m_zNear * Math.tan(this.m_fieldOfViewRadian * 0.5);
+		frustumWidth = frustumHeight * this.m_aspectRatio;
+		console.log(frustumWidth + " " + frustumHeight);
+
+		p = vec3.fromValues(0, 0, 0);
+		d = vec3.fromValues(0, 0, -1);
+		up = vec3.fromValues(0, 1, 0);
+		right = vec3.fromValues(1, 0, 0);
+
+		let nc = vec3.create();
+		vec3.scale(d, d, this.m_zNear);
+		vec3.add(nc, p, d);
+
+		vec3.scale(up, up, frustumHeight / 2);
+		vec3.scale(right, right, frustumWidth / 2);
+
+		diff = vec3.create();
+		vec3.subtract(diff, nc, up);
+
+		let nbl = vec3.create();
+
+		vec3.subtract(nbl, diff, right);
+
+		console.log(nbl);
+
+		let nbr = vec3.create();
+		vec3.add(nbr, diff, right);
+
+		console.log(nbr);
+
 		var colors = [];
 		var vertices = [];
-		for (var i = 0; i < 2000; i = i + 50) {
-			//függőleges
-			colors = colors.concat([0, 0, 0, 0.0]);
 
+		//függőleges
+		for (var i = fbl[0]; i <= fbr[0]; i += 0.05) {
+		
+			colors = colors.concat([0, 0, 0, 1.0]);
+			colors = colors.concat([0, 0, 0, 1.0]);
 
+			vertices = vertices.concat([i, nbl[1], nbl[2]]);
+			vertices = vertices.concat([i, nbl[1], fbl[2]]);
 
-			let v = this.convert2DPointTo3DWorld(i, 0);
-			vertices = vertices.concat([v[0], v[1], v[2]]);
-
-			v = this.convert2DPointTo3DWorld(i, 800);
-			vertices = vertices.concat([v[0], v[1], v[2]]);
-			//vízszintes
-			colors = colors.concat([0, 0, 0, 0.0]);
-
-
-
-			v = this.convert2DPointTo3DWorld(0, i);
-			vertices = vertices.concat([v[0], v[1], v[2]]);
-
-			v = this.convert2DPointTo3DWorld(1000, i);
-			vertices = vertices.concat([v[0], v[1], v[2]]);
-
-
+			/*vertices = vertices.concat([i,  0, nbl[2]]);
+			vertices = vertices.concat([i,  0 , fbl[2]]);*/
 		}
 
-		return [ vertices, colors ];
+		//console.log(vertices);
+		//vízszintes
+		
+		for (var i = -0.1; i >= fbr[2]; i += (-0.1)) {
+	
+				//függőleges
+				colors = colors.concat([0, 0, 0, 1.0]);
+				colors = colors.concat([0, 0, 0, 1.0]);
+
+				vertices = vertices.concat([fbl[0], nbl[1], i]);
+				vertices = vertices.concat([fbr[0], nbl[1], i]);
+				
+				/*vertices = vertices.concat([fbl[0], 0, i]);
+			    vertices = vertices.concat([fbr[0], 0, i]);*/
+		}
+
+		return [vertices, colors];
+		
+
 	}
 
 }
