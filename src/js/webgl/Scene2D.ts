@@ -256,7 +256,7 @@ export class Scene2D implements Scene {
 		var vertices = [];
 		for (var i = 0; i < 2000; i = i + 50) {
 			//függőleges
-			colors = colors.concat([0, 0, 0, 0.0]);
+			colors = colors.concat([0, 0, 0, 1.0]);
 
 
 
@@ -266,17 +266,17 @@ export class Scene2D implements Scene {
 			v = this.convert2DPointTo3DWorld(i, 800);
 			vertices = vertices.concat([v[0], v[1], v[2]]);
 			//vízszintes
-			colors = colors.concat([0, 0, 0, 0.0]);
+			colors = colors.concat([0, 0, 0, 1.0]);
 
 
-
+			colors = colors.concat([0, 0, 0, 1.0]);
 			v = this.convert2DPointTo3DWorld(0, i);
 			vertices = vertices.concat([v[0], v[1], v[2]]);
 
 			v = this.convert2DPointTo3DWorld(1000, i);
 			vertices = vertices.concat([v[0], v[1], v[2]]);
 
-
+			colors = colors.concat([0, 0, 0, 1.0]);
 		}
 
 		return [ vertices, colors ];
