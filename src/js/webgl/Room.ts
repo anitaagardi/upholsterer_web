@@ -12,11 +12,15 @@ export class Room {
 	private m_squares: Square[] = [];
 	private room_Name: string;
 	private square_meter: number;
-	constructor(square: Square, line_size: number, roomName: string, squareMeter: number) {
+	private room_Height:number;
+	private room_Width:number;
+	constructor(square: Square, line_size: number, roomName: string, width:number,height:number,squareMeter: number) {
 		this.basic_square = square;
 		this.line_size = line_size;
 		this.room_Name = roomName;
 		this.square_meter = squareMeter;
+		this.room_Height=height;
+		this.room_Width=width;
 		let v1 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1] + line_size, 0.0);
 		let v2 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1], 0.0);
 		let v3 = vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1] + line_size, 0.0);
@@ -75,7 +79,12 @@ export class Room {
 	get squareMeter(): number {
 		return this.square_meter;
 	}
-
+	get width():number{
+		return this.room_Width;
+	}
+	get height():number{
+		return this.room_Height;
+	}
 	contains(m_rooms: Room[]): number {
 		console.log("CONTAINSBE VAN");
 

@@ -214,10 +214,11 @@ export class Main {
 				vec4.fromValues(scene.rooms[i].squares[0].rightLowerCoordinate[0], scene.rooms[i].squares[0].rightLowerCoordinate[1]
 					, scene.rooms[i].squares[0].rightLowerCoordinate[2], 1.0));
 			console.log("E " + screenPointFrom[0] + " " + screenPointFrom[1]);
-
-			ctx.fillText(scene.rooms[i].roomName + "", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 3);
+			ctx.font = (10*scene.rooms[i].height)+"px Arial";
 			
-			ctx.fillText(scene.rooms[i].squareMeter+" m2 ",(screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 2);
+			ctx.fillText(scene.rooms[i].roomName + "", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) /2.4);
+			
+			ctx.fillText(scene.rooms[i].squareMeter+" m2 ",(screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 1.70);
 
 			for (let j = 0; j < scene.rooms[i].squares.length; j++) {
 				for (let k = 0; k < scene.rooms[i].squares[j].triangles.length; k++) {

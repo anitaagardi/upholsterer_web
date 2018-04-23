@@ -99,11 +99,11 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 		vec4.fromValues(192, 192, 192, 1.0)
 	);
 
-	if (new Room(square, roomBorder, roomName, roomWidthSquareM * roomHeightSquareM).contains(scene2D.rooms) == -1) {
+	if (new Room(square, roomBorder, roomName,roomWidthSquareM, roomHeightSquareM,roomWidthSquareM * roomHeightSquareM).contains(scene2D.rooms) == -1) {
 		//scene2D.rooms.push(new Room(square, 0.05));
 		//console.log(roomBorder+1 +" border");
 		console.log("ITTT NEW ROOM");
-		scene2D.addRoom(new Room(square, roomBorder, roomName, roomWidthSquareM * roomHeightSquareM));
+		scene2D.addRoom(new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM,roomWidthSquareM * roomHeightSquareM));
 	}
 	//scene2D.rooms.push(new Room(square, 0.05));
 
