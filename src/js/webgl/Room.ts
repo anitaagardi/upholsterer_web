@@ -11,12 +11,12 @@ export class Room {
 	private line_size: number;
 	private m_squares: Square[] = [];
 	private room_Name: string;
-	private square_meter:number;
-	constructor(square: Square, line_size: number,roomName:string,squareMeter:number) {
+	private square_meter: number;
+	constructor(square: Square, line_size: number, roomName: string, squareMeter: number) {
 		this.basic_square = square;
 		this.line_size = line_size;
-		this.room_Name=roomName;
-		this.square_meter=squareMeter;
+		this.room_Name = roomName;
+		this.square_meter = squareMeter;
 		let v1 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1] + line_size, 0.0);
 		let v2 = vec3.fromValues(square.rightUpperCoordinate[0] + line_size, square.rightUpperCoordinate[1], 0.0);
 		let v3 = vec3.fromValues(square.leftUpperCoordinate[0] - line_size, square.leftUpperCoordinate[1] + line_size, 0.0);
@@ -66,18 +66,18 @@ export class Room {
 		this.m_squares[3] = this.left_square;
 		this.m_squares[4] = this.right_square;
 
-		
+
 		return this.m_squares;
 	}
-	get roomName():String{
+	get roomName(): String {
 		return this.room_Name;
 	}
-	get squareMeter():number{
+	get squareMeter(): number {
 		return this.square_meter;
 	}
-	
-	contains(m_rooms: Room[]): boolean {
-		console.log()
+
+	contains(m_rooms: Room[]): number {
+		console.log("CONTAINSBE VAN");
 
 		/*for(var i=0;i<m_rooms.length;i++){
 			var count=0;
@@ -102,23 +102,23 @@ export class Room {
 		*/
 
 		for (var i = 0; i < m_rooms.length; i++) {
-			if( !(this.squares[2].leftLowerCoordinate[0] >  m_rooms[i].squares[1].rightUpperCoordinate[0]
-				||  this.squares[1].rightUpperCoordinate[0] <  m_rooms[i].squares[2].leftLowerCoordinate[0]
-				||  this.squares[2].leftLowerCoordinate[1] >  m_rooms[i].squares[1].rightUpperCoordinate[1]
-				||  this.squares[1].rightUpperCoordinate[1] < m_rooms[i].squares[2].leftLowerCoordinate[1])) {
+			if (!(this.squares[2].leftLowerCoordinate[0] > m_rooms[i].squares[1].rightUpperCoordinate[0]
+				|| this.squares[1].rightUpperCoordinate[0] < m_rooms[i].squares[2].leftLowerCoordinate[0]
+				|| this.squares[2].leftLowerCoordinate[1] > m_rooms[i].squares[1].rightUpperCoordinate[1]
+				|| this.squares[1].rightUpperCoordinate[1] < m_rooms[i].squares[2].leftLowerCoordinate[1])) {
 
-					return true;
-				} else if(
-				 !(	m_rooms[i].squares[2].leftLowerCoordinate[0] >  this.squares[1].rightUpperCoordinate[0]
-				||  m_rooms[i].squares[1].rightUpperCoordinate[0] <  this.squares[2].leftLowerCoordinate[0]
-				||  m_rooms[i].squares[2].leftLowerCoordinate[1] >  this.squares[1].rightUpperCoordinate[1]
-				||  m_rooms[i].squares[1].rightUpperCoordinate[1] < this.squares[2].leftLowerCoordinate[1]
+				return i;
+			} else if (
+				!(m_rooms[i].squares[2].leftLowerCoordinate[0] > this.squares[1].rightUpperCoordinate[0]
+					|| m_rooms[i].squares[1].rightUpperCoordinate[0] < this.squares[2].leftLowerCoordinate[0]
+					|| m_rooms[i].squares[2].leftLowerCoordinate[1] > this.squares[1].rightUpperCoordinate[1]
+					|| m_rooms[i].squares[1].rightUpperCoordinate[1] < this.squares[2].leftLowerCoordinate[1]
 
 				)) {
-					return true;
-				}
-			
+				return i;
+			}
+
 		}
-		return false;
+		return -1;
 	}
 }
