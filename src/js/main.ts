@@ -45,10 +45,10 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	let roomBorderSquareM=roomBorder;
 	//m2 beállítása
 	
-	roomWidth = roomWidth-roomBorder * 50;
-	roomHeight = roomHeight * 50;
-	roomUpperLeftX=roomUpperLeftX*50;
-	roomUpperLeftY=roomUpperLeftY*50;
+	roomWidth = roomWidth * 50-4*Math.sqrt(4*roomBorder*roomBorder)*50;//4 mert 2vel volt több meg az uppercoordinate is el van tolva 2-ve
+	roomHeight = roomHeight* 50-4*Math.sqrt(4*roomBorder*roomBorder)*50;
+	roomUpperLeftX=(roomUpperLeftX)*50+2*Math.sqrt(4*roomBorder*roomBorder)*50;
+	roomUpperLeftY=(roomUpperLeftY)*50+2*Math.sqrt(4*roomBorder*roomBorder)*50;
 	
 	console.log((roomUpperLeftX + roomWidth));
 	console.log((roomUpperLeftY + roomHeight));
@@ -92,10 +92,10 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	);	*/
 
 	square.createFromVec(
-		scene2D.convert2DPointTo3DWorld(roomUpperLeftX - roomBorder, roomUpperLeftY - roomBorder),
-		scene2D.convert2DPointTo3DWorld(roomUpperLeftX + roomWidth - roomBorder, roomUpperLeftY - roomBorder),
-		scene2D.convert2DPointTo3DWorld(roomUpperLeftX - roomBorder, roomUpperLeftY + roomHeight - roomBorder),
-		scene2D.convert2DPointTo3DWorld(roomUpperLeftX + roomWidth - roomBorder, roomUpperLeftY + roomHeight - roomBorder),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX, roomUpperLeftY),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX + roomWidth , roomUpperLeftY),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX, roomUpperLeftY + roomHeight),
+		scene2D.convert2DPointTo3DWorld(roomUpperLeftX + roomWidth, roomUpperLeftY + roomHeight),
 		vec4.fromValues(192, 192, 192, 1.0)
 	);
 
