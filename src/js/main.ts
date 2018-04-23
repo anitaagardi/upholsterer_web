@@ -40,11 +40,16 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 
 	let roomWidthSquareM = roomWidth;
 	let roomHeightSquareM = roomHeight;
+	let roomUpperLeftXSquareM=roomUpperLeftX;
+	let roomUpperLeftYSquareM=roomUpperLeftY;
+	let roomBorderSquareM=roomBorder;
 	//m2 beállítása
-	roomWidth = roomWidth * 50;
+	
+	roomWidth = roomWidth-roomBorder * 50;
 	roomHeight = roomHeight * 50;
-
-
+	roomUpperLeftX=roomUpperLeftX*50;
+	roomUpperLeftY=roomUpperLeftY*50;
+	
 	console.log((roomUpperLeftX + roomWidth));
 	console.log((roomUpperLeftY + roomHeight));
 
