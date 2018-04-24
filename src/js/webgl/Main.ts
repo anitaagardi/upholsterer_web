@@ -37,11 +37,13 @@ export class Main {
 			program: this.shaderProgram,
 			attribLocations: {
 				vertexPosition: this.gl.getAttribLocation(this.shaderProgram, 'aVertexPosition'),
-				vertexColor: this.gl.getAttribLocation(this.shaderProgram, 'aVertexColor')
+				textureCoord: this.gl.getAttribLocation(this.shaderProgram, 'aTextureCoord'),
+				//vertexColor: this.gl.getAttribLocation(this.shaderProgram, 'aVertexColor')
 			},
 			uniformLocations: {
 				projectionMatrix: this.gl.getUniformLocation(this.shaderProgram, 'uProjectionMatrix'),
 				modelViewMatrix: this.gl.getUniformLocation(this.shaderProgram, 'uModelViewMatrix'),
+				uSampler: this.gl.getUniformLocation(this.shaderProgram, 'uSampler'),
 			},
 		};
 
@@ -60,6 +62,69 @@ export class Main {
 		)
 	};
 
+	//
+	// Initialize a texture and load an image.
+	// When the image finished loading copy it into the texture.
+	//
+	loadTexture = (image:HTMLImageElement) => {
+		const texture = this.gl.createTexture();
+		this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+
+		// Because images have to be download over the internet
+		// they might take a moment until they are ready.
+		// Until then put a single pixel in the texture so we can
+		// use it immediately. When the image has finished downloading
+		// we'll update the texture with the contents of the image.
+		const level = 0;
+		const internalFormat = this.gl.RGBA;
+		const width = 1;
+		const height = 1;
+		const border = 0;
+		const srcFormat = this.gl.RGBA;
+		const srcType = this.gl.UNSIGNED_BYTE;
+		/*const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+		this.gl.texImage2D(this.gl.TEXTURE_2D, level, internalFormat,
+			width, height, border, srcFormat, srcType,
+			pixel);*/
+
+		//const image = new Image();
+		//image.onload = () => {
+			console.log("BEtolt");
+			this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+			this.gl.texImage2D(this.gl.TEXTURE_2D, level, internalFormat,
+				srcFormat, srcType, image);
+
+			// WebGL1 has different requirements for power of 2 images
+			// vs non power of 2 images so check if the image is a
+			// power of 2 in both dimensions.
+			if (this.isPowerOf2(image.width) && this.isPowerOf2(image.height)) {
+				// Yes, it's a power of 2. Generate mips.
+				this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+				this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+				this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+				this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+				//this.gl.texParameterf(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAX_LEVEL, 16);
+				this.gl.generateMipmap(this.gl.TEXTURE_2D);
+				//this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+				//this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+				
+			} else {
+				// No, it's not a power of 2. Turn of mips and set
+				// wrapping to clamp to edge
+				this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+				this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+				this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+			}
+		//};
+		//image.src = url;
+
+		return texture;
+	}
+
+	isPowerOf2 = (value) => {
+		return (value & (value - 1)) == 0;
+	}
+
 	//TODO: szín legyen opcionális
 	initBuffers(positions, colors) {
 
@@ -77,13 +142,54 @@ export class Main {
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
 		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
 
+
 		return {
 			position: positionBuffer,
 			color: colorBuffer
 		};
 	}
 
+
+	initBuffersTexture(positions, textureCoords, indices) {
+
+		const positionBuffer = this.gl.createBuffer();
+
+
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
+
+		this.gl.bufferData(this.gl.ARRAY_BUFFER,
+			new Float32Array(positions),
+			this.gl.STATIC_DRAW);
+
+
+		const textureCoordBuffer = this.gl.createBuffer();
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, textureCoordBuffer);
+
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(textureCoords),
+			this.gl.STATIC_DRAW);
+
+		// Create an empty buffer object to store Index buffer
+		var indexBuffer = this.gl.createBuffer();
+
+		// Bind appropriate array buffer to it
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+		// Pass the vertex data to the buffer
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);
+
+
+		return {
+			position: positionBuffer,
+			textureCoord: textureCoordBuffer,
+			index: indexBuffer,
+		};
+	}
+
+
 	drawScene(scene?: Scene) {
+
+		const image = new Image();
+		    image.onload = () => {
 
 		if (!scene) {
 			scene = this.scene;
@@ -130,7 +236,33 @@ export class Main {
 
 		if (grid) {
 
-			let buffers = this.initBuffers(grid[0], grid[1]);
+			let vecs = [ ...grid[0][3], ...grid[0][2], ...grid[0][1], ...grid[0][0]];
+		    let buffers = this.initBuffersTexture(vecs, [
+				/*1024.0, 1024.0,
+				1024.0, 0.0,
+				0.0, 0.0,
+				1024.0, 1024.0,
+				0.0, 0.0,
+				0.0, 1024.0*/
+				2048.0, 2048.0,
+				2048.0, 0.0,
+				0.0, 0.0,
+				/*1024.0, 1024.0,
+				0.0, 0.0,*/
+				0, 2048.0
+
+			], [0,1,2,0,2,3]);
+
+			/*let buffers = this.initBuffers(grid[0], [
+				1.0,0.0,0.0,1.0,
+				1.0,0.0,0.0,1.0,
+				1.0,0.0,0.0,1.0,
+				1.0,0.0,0.0,1.0
+			]);*/
+
+			console.log(buffers);
+			
+			const texture = this.loadTexture(image);
 
 			{
 				const numComponents = 3;
@@ -140,6 +272,9 @@ export class Main {
 				const offset = 0;
 
 				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+
+				// Bind index buffer object
+				this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 				this.gl.vertexAttribPointer(
 					this.programInfo.attribLocations.vertexPosition,
 					numComponents,
@@ -151,7 +286,7 @@ export class Main {
 					this.programInfo.attribLocations.vertexPosition);
 			}
 
-			{
+			/*{
 				const numComponents = 4;
 				const type = this.gl.FLOAT;
 				const normalize = false;
@@ -167,12 +302,33 @@ export class Main {
 					offset);
 				this.gl.enableVertexAttribArray(
 					this.programInfo.attribLocations.vertexColor);
-			}
+			}*/
 
+			// tell webgl how to pull out the texture coordinates from buffer
+			{
+				const num = 2; // every coordinate composed of 2 values
+				const type = this.gl.FLOAT; // the data in the buffer is 32 bit float
+				const normalize = false; // don't normalize
+				const stride = 0; // how many bytes to get from one set to the next
+				const offset = 0; // how many bytes inside the buffer to start from
+				this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.textureCoord);
+				this.gl.vertexAttribPointer(this.programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
+				this.gl.enableVertexAttribArray(this.programInfo.attribLocations.textureCoord);
+			}
 
 			//TODO: useProgram-t nem biztos, hogy mindig meg kellene hívni
 			this.gl.useProgram(this.programInfo.program);
 
+			// Tell WebGL we want to affect texture unit 0
+			this.gl.activeTexture(this.gl.TEXTURE0);
+
+			// Bind the texture to texture unit 0
+			this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+
+			// Tell the shader we bound the texture to texture unit 0
+			this.gl.uniform1i(this.programInfo.uniformLocations.uSampler, 0);
+
+		
 			this.gl.uniformMatrix4fv(
 				this.programInfo.uniformLocations.projectionMatrix,
 				false,
@@ -185,10 +341,19 @@ export class Main {
 
 			//this.gl.drawArrays(this.gl.LINES, 0, grid[1].length / 4);
 
-			this.gl.drawArrays(this.gl.LINES, 0, grid[0].length/3);
+			//this.gl.drawArrays(this.gl.LINES, 0, grid[0].length/3);
+			//this.gl.drawArrays(this.gl.TRIANGLES, 0 , 3);
+
+			//this.gl.drawArrays(this.gl.TRIANGLES, 0 , 3);
+
+			this.gl.drawElements(this.gl.TRIANGLES, 6,  this.gl.UNSIGNED_SHORT, 0);
 
 		}
-
+		
+	    };
+		
+		image.src="grid.jpg";
+		/*
 
 		// look up the text canvas.
 		let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
@@ -341,6 +506,8 @@ export class Main {
 			//rács rajzolás
 
 		}
+
+		*/
 
 	}
 

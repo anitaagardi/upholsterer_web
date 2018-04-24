@@ -14,6 +14,29 @@ module.exports = {
     filename: 'js/main.js',
     path: path.resolve(__dirname, 'dist')
   },
+  devServer: {
+    //contentBase: path.join(__dirname, "./build/dist/angularjs/static"),
+    //publicPath: "./build/dist/angularjs/static",
+    compress: true,
+    port: 9000,
+    hot: false,
+    stats: {
+        assets: true,
+        children: false,
+        chunks: true,
+        hash: false,
+        modules: true,
+        publicPath: true,
+        timings: true,
+        version: false,
+        warnings: true
+    },
+    /*proxy: {
+        "/api/v1": "http://localhost:9180"
+    },
+    historyApiFallback: true*/
+    //watchContentBase: true
+},
   module: {
      rules: [
 	   {
@@ -53,6 +76,10 @@ module.exports = {
 				to: '.'
       },
 
+      { 
+        from: 'src/grid.jpg',
+        to: '.'
+      },
       { 
         from: 'src/css/main.css',
         to: './css/main.css'

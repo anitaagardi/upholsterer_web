@@ -1,4 +1,4 @@
-export const vertexShaderSource = `
+/*export const vertexShaderSource = `
     attribute vec4 aVertexPosition;
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
@@ -10,4 +10,19 @@ export const vertexShaderSource = `
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
 	  vColor = aVertexColor;
     }
-  `;
+  `;*/
+
+  export const vertexShaderSource  = `
+  attribute vec4 aVertexPosition;
+  attribute vec2 aTextureCoord;
+
+  uniform mat4 uModelViewMatrix;
+  uniform mat4 uProjectionMatrix;
+
+  varying highp vec2 vTextureCoord;
+
+  void main(void) {
+    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    vTextureCoord = aTextureCoord;
+  }
+`;

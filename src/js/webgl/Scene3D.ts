@@ -67,6 +67,9 @@ export class Scene3D implements Scene {
 			this.m_modelViewMatrix,
 			[0.0, 0.0, translateZ]);
 
+		/*mat4.rotateY(this.m_modelViewMatrix,
+				this.m_modelViewMatrix,
+				-90 * Math.PI / 180);*/
 
 
 		//fbr = fc - (up * Hfar/2) + (right * Wfar/2)
@@ -374,6 +377,15 @@ export class Scene3D implements Scene {
 				/*vertices = vertices.concat([fbl[0], 0, i]);
 			    vertices = vertices.concat([fbr[0], 0, i]);*/
 		}
+
+		vertices=[
+			[fbl[0], nbl[1], fbl[2]],
+			[fbl[0], nbl[1], nbl[2]],
+			[fbr[0], nbl[1], nbr[2]],
+			[fbr[0], nbl[1], fbr[2]],
+		];
+
+		console.log(vertices);
 
 		return [vertices, colors];
 		
