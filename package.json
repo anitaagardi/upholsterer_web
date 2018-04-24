@@ -29,6 +29,7 @@
     "@types/gl-matrix": "^2.4.0",
     "@types/webgl2": "0.0.3",
     "gl-matrix": "^2.4.0",
-    "rxjs": "^5.5.8"
+    "rxjs": "^5.5.8",
+    "webpack-dev-server": "^3.1.3"
   }
 }
