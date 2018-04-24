@@ -8,8 +8,8 @@
 	<div class="banner">
 		<ul>
 			<li class="active" style="padding: 5px 250px;font-size: 40px">Lakberendező alkalmazás</li>
-			<li> 2D alaprajz </li>
-			<li> 3D alaprajz </li>
+			<li><span id="2d">2D alaprajz</span></li>
+			<li><span id="3d">3D alaprajz</span></li>
 		</ul>
 	</div>
 	<div class="editor">
@@ -23,27 +23,31 @@
 			<h3 class="formText">Új szoba létrehozása:</h3>
 			<form>
 				<div>
-					<input type="number" id="roomUpperLeftX" placeholder="Bal felső X koordináta:" />
+					<input type="number" id="roomUpperLeftX" placeholder="Bal felső X koordináta (m):" />
 				</div>
 				<div>
-					<input type="number" id="roomUpperLeftY" placeholder="Bal felső Y koordináta:" />
+					<input type="number" id="roomUpperLeftY" placeholder="Bal felső Y koordináta (m):" />
 				</div>
 				<div>
-					<input type="number" id="roomWidth" placeholder="Szélesség:" />
+					<input type="number" id="roomWidth" placeholder="Szélesség (m):" />
 				</div>
 				<div>
-					<input type="number" id="roomHeight" placeholder="Magasság:" />
+					<input type="number" id="roomHeight" placeholder="Magasság (m):" />
 				</div>
+				
 				<div>
-					<input type="number" id="roomBorder" placeholder="Keret vastagsága:" />
+					<input type="number" id="roomBorder" placeholder="Keret vastagsága (m):" />
 				</div>
 				<div>
 					<input type="text" id="roomName" placeholder="Szoba neve:" />
 				</div>
 
 				<button id="addNewRoom"> Szoba hozzáadása </button>
+				<button id="removeRoom" disabled> Szoba törlése </button>
 			</form>
+			
 		</div>
+
 	</div>
 	<script src="js/main.js"></script>
 </body>

@@ -5,7 +5,7 @@ import { Room } from './Room';
 
 import { Scene } from './Scene';
 
-import { Subject }  from 'rxjs/Subject';
+import { Subject } from 'rxjs/Subject';
 
 export class Scene2D implements Scene {
 
@@ -59,7 +59,7 @@ export class Scene2D implements Scene {
 	}
 
 
-	convert3DPointToScreen(point: vec4):number[] {
+	convert3DPointToScreen(point: vec4): number[] {
 
 		let multipliedMatrix = mat4.create();
 		mat4.multiply(multipliedMatrix, this.m_projectionMatrix, this.m_modelViewMatrix);
@@ -211,9 +211,17 @@ export class Scene2D implements Scene {
 
 		return [rayOrigin, normalizedRayDirection];
 	}
-	
+
 	addRoom(room: Room) {
 		this.m_rooms.push(room);
+		this.roomSource.next();
+	}
+	removeRoom(indexRemoveRoom:number) {
+		let index = indexRemoveRoom;
+		for (let i = index+1; i < this.m_rooms.length; i++) {
+			this.m_rooms[i-1] = this.m_rooms[i];
+		}
+		this.m_rooms.length=this.m_rooms.length-1;
 		this.roomSource.next();
 	}
 
@@ -251,7 +259,7 @@ export class Scene2D implements Scene {
 		this.grid = grid;
 	}
 
-	getGrid():any {
+	getGrid(): any {
 		var colors = [];
 		var vertices = [];
 		for (var i = 0; i < 2000; i = i + 50) {
@@ -279,7 +287,7 @@ export class Scene2D implements Scene {
 			colors = colors.concat([0, 0, 0, 1.0]);
 		}
 
-		return [ vertices, colors ];
+		return [vertices, colors];
 	}
 
 }

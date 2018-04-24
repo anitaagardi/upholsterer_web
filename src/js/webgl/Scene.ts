@@ -12,6 +12,7 @@ export interface Scene {
     lookAt?(eye:vec3, center:vec3, up:vec3);
     getRayTo2DPoint(x, y): vec3[];
     addRoom(room: Room);
+    removeRoom(indexRemoveRoom:number);
     getGrid():any;
     roomSource$:Observable<any>;
     projectionMatrix: mat4;

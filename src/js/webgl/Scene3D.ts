@@ -350,39 +350,31 @@ export class Scene3D implements Scene {
 		var vertices = [];
 
 		//függőleges
-		for (var i = fbl[0]; i <= fbr[0]; i += 0.05) {
+		/*for (var i = fbl[0]; i <= fbr[0]; i += 0.05) {
 		
 			colors = colors.concat([0, 0, 0, 1.0]);
 			colors = colors.concat([0, 0, 0, 1.0]);
 
 			vertices = vertices.concat([i, nbl[1], nbl[2]]);
 			vertices = vertices.concat([i, nbl[1], fbl[2]]);
-
-			/*vertices = vertices.concat([i,  0, nbl[2]]);
-			vertices = vertices.concat([i,  0 , fbl[2]]);*/
 		}
 
-		//console.log(vertices);
 		//vízszintes
 		
 		for (var i = -0.1; i >= fbr[2]; i += (-0.1)) {
-	
 				//függőleges
 				colors = colors.concat([0, 0, 0, 1.0]);
 				colors = colors.concat([0, 0, 0, 1.0]);
 
 				vertices = vertices.concat([fbl[0], nbl[1], i]);
 				vertices = vertices.concat([fbr[0], nbl[1], i]);
-				
-				/*vertices = vertices.concat([fbl[0], 0, i]);
-			    vertices = vertices.concat([fbr[0], 0, i]);*/
-		}
+		}*/
 
 		vertices=[
-			[fbl[0], nbl[1], fbl[2]],
-			[fbl[0], nbl[1], nbl[2]],
-			[fbr[0], nbl[1], nbr[2]],
-			[fbr[0], nbl[1], fbr[2]],
+			fbl[0], nbl[1], fbl[2],
+			fbl[0], nbl[1], nbl[2],
+			fbr[0], nbl[1], nbr[2],
+			fbr[0], nbl[1], fbr[2],
 		];
 
 		console.log(vertices);
@@ -390,6 +382,10 @@ export class Scene3D implements Scene {
 		return [vertices, colors];
 		
 
+	}
+
+	removeRoom(indexRemoveRoom:number) {
+	
 	}
 
 }
