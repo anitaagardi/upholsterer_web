@@ -218,10 +218,12 @@ export class Scene2D implements Scene {
 	}
 	removeRoom(indexRemoveRoom:number) {
 		let index = indexRemoveRoom;
-		for (let i = index+1; i < this.m_rooms.length; i++) {
+		/*for (let i = index+1; i < this.m_rooms.length; i++) {
 			this.m_rooms[i-1] = this.m_rooms[i];
 		}
 		this.m_rooms.length=this.m_rooms.length-1;
+		*/
+		this.m_rooms.splice(indexRemoveRoom,1);
 		this.roomSource.next();
 	}
 
