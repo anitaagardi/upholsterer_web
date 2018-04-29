@@ -16,6 +16,8 @@ let main = new Main('#glcanvas');
 
 let points: vec3[] = [];
 let indexRemoveRoom = -1;
+let clickedX;
+let clickedY;
 
 //let scene3D = new Scene3D(1000, 800, 45, 0.1, 100, -5.0,true);
 //main.drawScene(scene2D);
@@ -43,7 +45,7 @@ select3D.addEventListener("click", (event) => {
 
 let addNewRoomHTMLInput = (<HTMLInputElement>document.getElementById("addNewRoom"));
 let removeRoomHTMLInput = (<HTMLInputElement>document.getElementById("removeRoom"));
-
+let addDoorHTMLInput = (<HTMLInputElement>document.getElementById("addDoor"));
 addNewRoomHTMLInput.addEventListener("click", (event) => {
 	event.preventDefault();
 	console.log("addnewRoom");
@@ -61,7 +63,7 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	let roomBorderSquareM = roomBorder;
 	let roomMValues = [roomUpperLeftXSquareM, roomUpperLeftYSquareM, roomWidthSquareM, roomHeightSquareM, roomBorderSquareM];
 	//m2 beállítása
-
+	
 	roomWidth = roomWidth * 50 - 4 * Math.sqrt(4 * roomBorder * roomBorder) * 50;//4 mert 2vel volt több meg az uppercoordinate is el van tolva 2-ve
 	roomHeight = roomHeight * 50 - 4 * Math.sqrt(4 * roomBorder * roomBorder) * 50;
 	roomUpperLeftX = (roomUpperLeftX) * 50 + 2 * Math.sqrt(4 * roomBorder * roomBorder) * 50;
@@ -116,7 +118,7 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 		vec4.fromValues(192, 192, 192, 1.0)
 	);
 	let indexOfActualRoom = new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).contains(scene2D.rooms);
-	if (indexOfActualRoom == -1&&indexRemoveRoom==-1) {
+	if (indexOfActualRoom == -1 && indexRemoveRoom == -1) {
 		//scene2D.rooms.push(new Room(square, 0.05));
 		//console.log(roomBorder+1 +" border");
 		console.log("ITTT NEW ROOM");
@@ -124,8 +126,8 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	} else {
 		//let isEqualRoom = new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).equals(scene2D.rooms[indexRemoveRoom]);
 		//console.log("equals? "+isEqualRoom);
-		if (indexRemoveRoom!=-1) {
-			let removedRoom=new Room(scene2D.rooms[indexRemoveRoom].basicSquare, scene2D.rooms[indexRemoveRoom].roomBorder, scene2D.rooms[indexRemoveRoom].roomName+"", scene2D.rooms[indexRemoveRoom].width, scene2D.rooms[indexRemoveRoom].height, scene2D.rooms[indexRemoveRoom].squareMeter, scene2D.rooms[indexRemoveRoom].roomMValues);
+		if (indexRemoveRoom != -1) {
+			let removedRoom = new Room(scene2D.rooms[indexRemoveRoom].basicSquare, scene2D.rooms[indexRemoveRoom].roomBorder, scene2D.rooms[indexRemoveRoom].roomName + "", scene2D.rooms[indexRemoveRoom].width, scene2D.rooms[indexRemoveRoom].height, scene2D.rooms[indexRemoveRoom].squareMeter, scene2D.rooms[indexRemoveRoom].roomMValues);
 			scene2D.removeRoom(indexRemoveRoom);
 			let indexOfActualRoom2 = new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).contains(scene2D.rooms);
 			if (indexOfActualRoom2 == -1) {
@@ -133,8 +135,10 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 				//console.log(roomBorder+1 +" border");
 				console.log("ITTT NEW ROOM");
 				scene2D.addRoom(new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues));
-			}else{
-				scene2D.addRoom(removedRoom);
+			} else {
+				//scene2D.addRoom(removedRoom);
+				new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).modifyAll(scene2D.rooms);
+
 			}
 		}
 	}
@@ -145,7 +149,7 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	(<HTMLInputElement>document.getElementById("roomHeight")).value = "";
 	(<HTMLInputElement>document.getElementById("roomName")).value = "";
 	(<HTMLInputElement>document.getElementById("roomBorder")).value = "";
-	indexRemoveRoom=-1;
+	indexRemoveRoom = -1;
 	//main.drawScene(scene2D);
 });
 
@@ -161,14 +165,52 @@ removeRoomHTMLInput.addEventListener("click", (event) => {
 		(<HTMLInputElement>document.getElementById("roomBorder")).value = "";
 	}
 });
+addDoorHTMLInput.addEventListener("click", (event) => {
+	event.preventDefault();
 
+	if (indexRemoveRoom != -1) {
+		let direction = (<HTMLInputElement>document.getElementById("doorOptions")).value;
+		scene2D.rooms[indexRemoveRoom].addDoor(direction,0.1,clickedX,clickedY);
+		main.drawScene(scene2D);
+	}
+	/*if((<HTMLInputElement>document.getElementById("doorRight")).select){
+		if(indexRemoveRoom!=-1){
+			scene2D.rooms[indexRemoveRoom].addDoor("right",0.3);
+			main.drawScene(scene2D);
+		}
+	}
+	if((<HTMLInputElement>document.getElementById("doorLeft")).select){
+		if(indexRemoveRoom!=-1){
+			console.log("selected!!");
+			scene2D.rooms[indexRemoveRoom].addDoor("left",50);
+			main.drawScene(scene2D);
+		}
+
+	}
+	if((<HTMLInputElement>document.getElementById("doorUpper")).select){
+		if(indexRemoveRoom!=-1){
+			scene2D.rooms[indexRemoveRoom].addDoor("upper",0.3);
+			main.drawScene(scene2D);
+		}
+
+	}
+	if((<HTMLInputElement>document.getElementById("doorLower")).select){
+		if(indexRemoveRoom!=-1){
+			scene2D.rooms[indexRemoveRoom].addDoor("lower",0.3);
+			main.drawScene(scene2D);
+		}
+
+	}*/
+});
 
 main.subscribeClick((x, y) => {
 
 	console.log(x + " " + y);
-
+	
 	let [p, d] = scene2D.getRayTo2DPoint(x, y);
-
+	let clickedPoint = scene2D.convert2DPointTo3DWorld(x,y)
+	clickedX=clickedPoint[0];
+	clickedY=clickedPoint[1];
 	let result = false;
 
 

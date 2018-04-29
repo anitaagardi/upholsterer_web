@@ -226,6 +226,7 @@ export class Scene2D implements Scene {
 		this.m_rooms.splice(indexRemoveRoom,1);
 		this.roomSource.next();
 	}
+	
 
 	get projectionMatrix(): mat4 {
 		return this.m_projectionMatrix;

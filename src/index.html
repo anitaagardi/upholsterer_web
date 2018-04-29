@@ -8,8 +8,12 @@
 	<div class="banner">
 		<ul>
 			<li class="active" style="padding: 5px 250px;font-size: 40px">Lakberendező alkalmazás</li>
-			<li><span id="2d">2D alaprajz</span></li>
-			<li><span id="3d">3D alaprajz</span></li>
+			<li>
+				<span id="2d">2D alaprajz</span>
+			</li>
+			<li>
+				<span id="3d">3D alaprajz</span>
+			</li>
 		</ul>
 	</div>
 	<div class="editor">
@@ -34,7 +38,7 @@
 				<div>
 					<input type="number" id="roomHeight" placeholder="Magasság (m):" />
 				</div>
-				
+
 				<div>
 					<input type="number" id="roomBorder" placeholder="Keret vastagsága (m):" />
 				</div>
@@ -44,8 +48,22 @@
 
 				<button id="addNewRoom"> Szoba hozzáadása/módosítása </button>
 				<button id="removeRoom" disabled> Szoba törlése </button>
+				<div>
+					<select id="doorOptions">
+						<option value="left" id="doorLeft">Bal</option>
+						<option value="right" id="doorRight">Jobb</option>
+						<option value="upper" id="doorUpper">Felső</option>
+						<option value="lower" id="doorLower">Alsó</option>
+					</select>
+				</div>
+				<div>
+					<button id="addDoor">Ajtó hozzáadása</button>
+				</div>
+				<div>
+					<button id="removeDoor">Ajtó törlése</button>
+				</div>
 			</form>
-			
+
 		</div>
 
 	</div>

@@ -210,9 +210,9 @@ export class Main {
 
 		let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
 
-					// make a 2D context for it
+		// make a 2D context for it
 		let ctx = textCanvas.getContext("2d");
-		ctx.clearRect(0,0,textCanvas.width, textCanvas.height);
+		ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
 
 		const image = new Image();
 		image.onload = () => {
@@ -448,6 +448,8 @@ export class Main {
 
 						ctx.fillText(scene.rooms[i].squareMeter + " m2 ", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 1.70);
 
+						
+						//falak
 						for (let j = 0; j < scene.rooms[i].squares.length; j++) {
 							for (let k = 0; k < scene.rooms[i].squares[j].triangles.length; k++) {
 
@@ -505,6 +507,69 @@ export class Main {
 									const offset = 0;
 									let vertexCount = scene.vertexCount;
 									this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
+								}
+
+							}
+						}
+
+						//ajtó
+						for (let j = 0; j < scene.rooms[i].room_doors.length; j++) {
+							for (let k = 0; k < scene.rooms[i].room_doors[j].triangles.length; k++) {
+
+								let buffers = this.initBuffers(scene.rooms[i].room_doors[j].triangles[k].getVerticesArray(), scene.rooms[i].room_doors[j].triangles[k].getColorArray());
+
+								{
+									const numComponents = 3;
+									const type = this.gl.FLOAT;
+									const normalize = false;
+									const stride = 0;
+									const offset = 0;
+
+									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+									this.gl.vertexAttribPointer(
+										this.colorProgramInfo.attribLocations.vertexPosition,
+										numComponents,
+										type,
+										normalize,
+										stride,
+										offset);
+									this.gl.enableVertexAttribArray(
+										this.colorProgramInfo.attribLocations.vertexPosition);
+								}
+
+								{
+									const numComponents = 4;
+									const type = this.gl.FLOAT;
+									const normalize = false;
+									const stride = 0;
+									const offset = 0;
+									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+									this.gl.vertexAttribPointer(
+										this.colorProgramInfo.attribLocations.vertexColor,
+										numComponents,
+										type,
+										normalize,
+										stride,
+										offset);
+									this.gl.enableVertexAttribArray(
+										this.colorProgramInfo.attribLocations.vertexColor);
+								}
+
+								this.gl.useProgram(this.colorProgramInfo.program);
+
+								this.gl.uniformMatrix4fv(
+									this.colorProgramInfo.uniformLocations.projectionMatrix,
+									false,
+									scene.projectionMatrix);
+								this.gl.uniformMatrix4fv(
+									this.colorProgramInfo.uniformLocations.modelViewMatrix,
+									false,
+									scene.modelViewMatrix);
+
+								{
+									const offset = 0;
+									let vertexCount = 4;
+									this.gl.drawArrays(this.gl.TRIANGLES, offset, 3);
 								}
 
 							}
