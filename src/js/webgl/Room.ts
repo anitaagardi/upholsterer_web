@@ -16,6 +16,7 @@ export class Room {
 	private room_Width: number;
 	private room_MValues: number[];
 	private m_room_doors: Square[] = [];
+	private m_room_windows: Square[] = [];
 	constructor(square: Square, line_size: number, roomName: string, width: number, height: number, squareMeter: number, roomMValues: number[]) {
 		this.basic_square = square;
 		this.line_size = line_size;
@@ -76,6 +77,151 @@ export class Room {
 
 		return this.m_squares;
 	}
+	removeDoor(direction, size, beginX, beginY) {
+		let begin;
+		if (direction == "left" || direction == "right") {
+			begin = beginY;
+		} else {
+			begin = beginX;
+		}
+		if (direction == "left") {
+			//let x=(this.left_square[0]+this.left_square[1])/2.5;
+
+			let s = new Square();
+			let v1 = vec3.fromValues(this.basicSquare.leftUpperCoordinate[0] - this.line_size, begin, 0.0);
+			let v2 = vec3.fromValues(this.basicSquare.leftUpperCoordinate[0], begin, 0.0);
+			let v3 = vec3.fromValues(this.basicSquare.leftLowerCoordinate[0], begin + size, 0.0);
+			let v4 = vec3.fromValues(this.basicSquare.leftLowerCoordinate[0] - this.line_size, begin + size, 0.0);
+			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsDoor(s);
+			if (index != -1) {
+				this.m_room_doors.splice(index, 1);
+			}
+		}
+		if (direction == "right") {
+			//let x=(this.right_square[0]+this.right_square[1])/2.5;
+			let y = (this.right_square[2] + this.right_square[3]) / 2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(this.basicSquare.rightUpperCoordinate[0] + this.line_size, begin, 0.0);
+			let v2 = vec3.fromValues(this.basicSquare.rightUpperCoordinate[0], begin, 0.0);
+			let v3 = vec3.fromValues(this.basicSquare.rightLowerCoordinate[0], begin + size, 0.0);
+			let v4 = vec3.fromValues(this.basicSquare.rightLowerCoordinate[0] + this.line_size, begin + size, 0.0);
+			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsDoor(s);
+			if (index != -1) {
+				this.m_room_doors.splice(index, 1);
+			}
+		}
+		if (direction == "upper") {
+			//let x = (this.upper_square[0] + this.upper_square[1]) / 2.5;
+			//let y=(this.upper_square[2]+this.upper_square[3])/2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(begin, this.basicSquare.rightUpperCoordinate[1] + this.line_size, 0.0);
+			let v2 = vec3.fromValues(begin, this.basicSquare.rightUpperCoordinate[1], 0.0);
+			let v3 = vec3.fromValues(begin + size, this.basicSquare.leftUpperCoordinate[1] + this.line_size, 0.0);
+			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftUpperCoordinate[1], 0.0);
+			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsDoor(s);
+			if (index != -1) {
+				this.m_room_doors.splice(index, 1);
+			}
+		}
+		if (direction == "lower") {
+			//let x = (this.lower_square[0] + this.lower_square[1]) / 2.5;
+			//let y=(this.lower_square[2]+this.lower_square[3])/2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(begin, this.basicSquare.rightLowerCoordinate[1], 0.0);
+			let v2 = vec3.fromValues(begin, this.basicSquare.rightLowerCoordinate[1] - this.line_size, 0.0);
+			let v3 = vec3.fromValues(begin + size, this.basicSquare.leftLowerCoordinate[1], 0.0);
+			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftLowerCoordinate[1] - this.line_size, 0.0);
+			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsDoor(s);
+			if (index != -1) {
+				this.m_room_doors.splice(index, 1);
+			}
+
+		}
+
+
+	}
+
+	removeWindow(direction, size, beginX, beginY) {
+		let begin;
+		if (direction == "left" || direction == "right") {
+			begin = beginY;
+		} else {
+			begin = beginX;
+		}
+		if (direction == "left") {
+			//let x=(this.left_square[0]+this.left_square[1])/2.5;
+
+			let s = new Square();
+			let v1 = vec3.fromValues(this.basicSquare.leftUpperCoordinate[0] - this.line_size, begin, 0.0);
+			let v2 = vec3.fromValues(this.basicSquare.leftUpperCoordinate[0], begin, 0.0);
+			let v3 = vec3.fromValues(this.basicSquare.leftLowerCoordinate[0], begin + size, 0.0);
+			let v4 = vec3.fromValues(this.basicSquare.leftLowerCoordinate[0] - this.line_size, begin + size, 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsWindow(s);
+			if (index != -1) {
+				this.m_room_windows.splice(index, 1);
+			}
+		}
+		if (direction == "right") {
+			//let x=(this.right_square[0]+this.right_square[1])/2.5;
+			let y = (this.right_square[2] + this.right_square[3]) / 2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(this.basicSquare.rightUpperCoordinate[0] + this.line_size, begin, 0.0);
+			let v2 = vec3.fromValues(this.basicSquare.rightUpperCoordinate[0], begin, 0.0);
+			let v3 = vec3.fromValues(this.basicSquare.rightLowerCoordinate[0], begin + size, 0.0);
+			let v4 = vec3.fromValues(this.basicSquare.rightLowerCoordinate[0] + this.line_size, begin + size, 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsWindow(s);
+			if (index != -1) {
+				this.m_room_windows.splice(index, 1);
+			}
+		}
+		if (direction == "upper") {
+			//let x = (this.upper_square[0] + this.upper_square[1]) / 2.5;
+			//let y=(this.upper_square[2]+this.upper_square[3])/2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(begin, this.basicSquare.rightUpperCoordinate[1] + this.line_size, 0.0);
+			let v2 = vec3.fromValues(begin, this.basicSquare.rightUpperCoordinate[1], 0.0);
+			let v3 = vec3.fromValues(begin + size, this.basicSquare.leftUpperCoordinate[1] + this.line_size, 0.0);
+			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftUpperCoordinate[1], 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsWindow(s);
+			if (index != -1) {
+				this.m_room_windows.splice(index, 1);
+			}
+		}
+		if (direction == "lower") {
+			//let x = (this.lower_square[0] + this.lower_square[1]) / 2.5;
+			//let y=(this.lower_square[2]+this.lower_square[3])/2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(begin, this.basicSquare.rightLowerCoordinate[1], 0.0);
+			let v2 = vec3.fromValues(begin, this.basicSquare.rightLowerCoordinate[1] - this.line_size, 0.0);
+			let v3 = vec3.fromValues(begin + size, this.basicSquare.leftLowerCoordinate[1], 0.0);
+			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftLowerCoordinate[1] - this.line_size, 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			let index = this.containsWindow(s);
+			if (index != -1) {
+				this.m_room_windows.splice(index, 1);
+			}
+
+		}
+
+
+	}
+
+
 	addDoor(direction, size, beginX, beginY) {
 		let begin;
 		if (direction == "left" || direction == "right") {
@@ -93,7 +239,9 @@ export class Room {
 			let v4 = vec3.fromValues(this.basicSquare.leftLowerCoordinate[0] - this.line_size, begin + size, 0.0);
 			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
 			s.createFromVec(v1, v2, v3, v4, v5);
-			this.m_room_doors.push(s);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_doors.push(s);
+			}
 		}
 		if (direction == "right") {
 			//let x=(this.right_square[0]+this.right_square[1])/2.5;
@@ -105,7 +253,9 @@ export class Room {
 			let v4 = vec3.fromValues(this.basicSquare.rightLowerCoordinate[0] + this.line_size, begin + size, 0.0);
 			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
 			s.createFromVec(v1, v2, v3, v4, v5);
-			this.m_room_doors.push(s);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_doors.push(s);
+			}
 		}
 		if (direction == "upper") {
 			//let x = (this.upper_square[0] + this.upper_square[1]) / 2.5;
@@ -117,7 +267,9 @@ export class Room {
 			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftUpperCoordinate[1], 0.0);
 			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
 			s.createFromVec(v1, v2, v3, v4, v5);
-			this.m_room_doors.push(s);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_doors.push(s);
+			}
 		}
 		if (direction == "lower") {
 			//let x = (this.lower_square[0] + this.lower_square[1]) / 2.5;
@@ -129,13 +281,140 @@ export class Room {
 			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftLowerCoordinate[1] - this.line_size, 0.0);
 			let v5 = vec4.fromValues(220 / 255.0, 220 / 255.0, 220 / 255.0, 1.0);
 			s.createFromVec(v1, v2, v3, v4, v5);
-			this.m_room_doors.push(s);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_doors.push(s);
+			}
 
 		}
 
 	}
+
+	addWindow(direction, size, beginX, beginY) {
+		let begin;
+		if (direction == "left" || direction == "right") {
+			begin = beginY;
+		} else {
+			begin = beginX;
+		}
+		if (direction == "left") {
+			//let x=(this.left_square[0]+this.left_square[1])/2.5;
+
+			let s = new Square();
+			let v1 = vec3.fromValues(this.basicSquare.leftUpperCoordinate[0] - this.line_size, begin, 0.0);
+			let v2 = vec3.fromValues(this.basicSquare.leftUpperCoordinate[0], begin, 0.0);
+			let v3 = vec3.fromValues(this.basicSquare.leftLowerCoordinate[0], begin + size, 0.0);
+			let v4 = vec3.fromValues(this.basicSquare.leftLowerCoordinate[0] - this.line_size, begin + size, 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_windows.push(s);
+			}
+		}
+		if (direction == "right") {
+			//let x=(this.right_square[0]+this.right_square[1])/2.5;
+			let y = (this.right_square[2] + this.right_square[3]) / 2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(this.basicSquare.rightUpperCoordinate[0] + this.line_size, begin, 0.0);
+			let v2 = vec3.fromValues(this.basicSquare.rightUpperCoordinate[0], begin, 0.0);
+			let v3 = vec3.fromValues(this.basicSquare.rightLowerCoordinate[0], begin + size, 0.0);
+			let v4 = vec3.fromValues(this.basicSquare.rightLowerCoordinate[0] + this.line_size, begin + size, 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_windows.push(s);
+			}
+		}
+		if (direction == "upper") {
+			//let x = (this.upper_square[0] + this.upper_square[1]) / 2.5;
+			//let y=(this.upper_square[2]+this.upper_square[3])/2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(begin, this.basicSquare.rightUpperCoordinate[1] + this.line_size, 0.0);
+			let v2 = vec3.fromValues(begin, this.basicSquare.rightUpperCoordinate[1], 0.0);
+			let v3 = vec3.fromValues(begin + size, this.basicSquare.leftUpperCoordinate[1] + this.line_size, 0.0);
+			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftUpperCoordinate[1], 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_windows.push(s);
+			}
+		}
+		if (direction == "lower") {
+			//let x = (this.lower_square[0] + this.lower_square[1]) / 2.5;
+			//let y=(this.lower_square[2]+this.lower_square[3])/2.5;
+			let s = new Square();
+			let v1 = vec3.fromValues(begin, this.basicSquare.rightLowerCoordinate[1], 0.0);
+			let v2 = vec3.fromValues(begin, this.basicSquare.rightLowerCoordinate[1] - this.line_size, 0.0);
+			let v3 = vec3.fromValues(begin + size, this.basicSquare.leftLowerCoordinate[1], 0.0);
+			let v4 = vec3.fromValues(begin + size, this.basicSquare.leftLowerCoordinate[1] - this.line_size, 0.0);
+			let v5 = vec4.fromValues(152 / 255.0, 152 / 255.0, 152 / 255.0, 1.0);
+			s.createFromVec(v1, v2, v3, v4, v5);
+			if (this.containsDoor(s) == -1&&this.containsWindow(s)==-1) {
+				this.m_room_windows.push(s);
+			}
+
+		}
+
+	}
+
+	containsDoor(door: Square): number {
+		for (let i = 0; i < this.m_room_doors.length; i++) {
+			if (!(door.leftLowerCoordinate[0] > this.m_room_doors[i].rightUpperCoordinate[0]
+				|| door.rightUpperCoordinate[0] < this.m_room_doors[i].leftLowerCoordinate[0]
+				|| door.leftLowerCoordinate[1] > this.m_room_doors[i].rightUpperCoordinate[1]
+				|| door.rightUpperCoordinate[1] < this.m_room_doors[i].leftLowerCoordinate[1])) {
+				console.log("contains door " + i);
+				return i;
+			} else if (
+				!(this.m_room_doors[i].leftLowerCoordinate[0] > door.rightUpperCoordinate[0]
+					|| this.m_room_doors[i].rightUpperCoordinate[0] < door.leftLowerCoordinate[0]
+					|| this.m_room_doors[i].leftLowerCoordinate[1] > door.rightUpperCoordinate[1]
+					|| this.m_room_doors[i].rightUpperCoordinate[1] < door.leftLowerCoordinate[1]
+
+				)) {
+				console.log("contains door " + i);
+				return i;
+
+			}
+
+		}
+		console.log("contains door " + (-1));
+		return -1;
+	}
+	containsWindow(window: Square): number {
+		for (let i = 0; i < this.m_room_windows.length; i++) {
+			if (!(window.leftLowerCoordinate[0] > this.m_room_windows[i].rightUpperCoordinate[0]
+				|| window.rightUpperCoordinate[0] < this.m_room_windows[i].leftLowerCoordinate[0]
+				|| window.leftLowerCoordinate[1] > this.m_room_windows[i].rightUpperCoordinate[1]
+				|| window.rightUpperCoordinate[1] < this.m_room_windows[i].leftLowerCoordinate[1])) {
+				console.log("contains window " + i);
+				return i;
+			} else if (
+				!(this.m_room_windows[i].leftLowerCoordinate[0] > window.rightUpperCoordinate[0]
+					|| this.m_room_windows[i].rightUpperCoordinate[0] < window.leftLowerCoordinate[0]
+					|| this.m_room_windows[i].leftLowerCoordinate[1] > window.rightUpperCoordinate[1]
+					|| this.m_room_windows[i].rightUpperCoordinate[1] < window.leftLowerCoordinate[1]
+
+				)) {
+				console.log("contains window " + i);
+				return i;
+
+			}
+
+		}
+		console.log("contains window " + (-1));
+		return -1;
+	}
 	get room_doors(): Square[] {
 		return this.m_room_doors;
+	}
+	get room_windows(): Square[] {
+		return this.m_room_windows;
+	}
+	set room_doors(roomDors:Square[]){
+		this.m_room_doors=roomDors;
+	}
+	set room_windows(roomWindows:Square[]){
+		this.m_room_windows=roomWindows;
 	}
 	get roomName(): String {
 		return this.room_Name;

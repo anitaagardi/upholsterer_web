@@ -46,6 +46,10 @@ select3D.addEventListener("click", (event) => {
 let addNewRoomHTMLInput = (<HTMLInputElement>document.getElementById("addNewRoom"));
 let removeRoomHTMLInput = (<HTMLInputElement>document.getElementById("removeRoom"));
 let addDoorHTMLInput = (<HTMLInputElement>document.getElementById("addDoor"));
+let removeDoorHTMLInput = (<HTMLInputElement>document.getElementById("removeDoor"));
+
+let addWindowHTMLInput = (<HTMLInputElement>document.getElementById("addWindow"));
+let removeWindowHTMLInput = (<HTMLInputElement>document.getElementById("removeWindow"));
 addNewRoomHTMLInput.addEventListener("click", (event) => {
 	event.preventDefault();
 	console.log("addnewRoom");
@@ -128,6 +132,8 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 		//console.log("equals? "+isEqualRoom);
 		if (indexRemoveRoom != -1) {
 			let removedRoom = new Room(scene2D.rooms[indexRemoveRoom].basicSquare, scene2D.rooms[indexRemoveRoom].roomBorder, scene2D.rooms[indexRemoveRoom].roomName + "", scene2D.rooms[indexRemoveRoom].width, scene2D.rooms[indexRemoveRoom].height, scene2D.rooms[indexRemoveRoom].squareMeter, scene2D.rooms[indexRemoveRoom].roomMValues);
+			removedRoom.room_doors=scene2D.rooms[indexRemoveRoom].room_doors;
+			removedRoom.room_windows=scene2D.rooms[indexRemoveRoom].room_windows;
 			scene2D.removeRoom(indexRemoveRoom);
 			let indexOfActualRoom2 = new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).contains(scene2D.rooms);
 			if (indexOfActualRoom2 == -1) {
@@ -137,8 +143,8 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 				scene2D.addRoom(new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues));
 			} else {
 				//scene2D.addRoom(removedRoom);
-				new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).modifyAll(scene2D.rooms);
-
+				// EZT KELL MÓDOSÍTANI !!!   new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).modifyAll(scene2D.rooms);
+				scene2D.addRoom(removedRoom);
 			}
 		}
 	}
@@ -165,6 +171,14 @@ removeRoomHTMLInput.addEventListener("click", (event) => {
 		(<HTMLInputElement>document.getElementById("roomBorder")).value = "";
 	}
 });
+removeDoorHTMLInput.addEventListener("click", (event) => {
+	event.preventDefault();
+	if(indexRemoveRoom!=-1){
+		let direction = (<HTMLInputElement>document.getElementById("doorOptions")).value;
+		scene2D.rooms[indexRemoveRoom].removeDoor(direction,0.1,clickedX,clickedY);
+		main.drawScene(scene2D);
+	}
+});
 addDoorHTMLInput.addEventListener("click", (event) => {
 	event.preventDefault();
 
@@ -173,34 +187,26 @@ addDoorHTMLInput.addEventListener("click", (event) => {
 		scene2D.rooms[indexRemoveRoom].addDoor(direction,0.1,clickedX,clickedY);
 		main.drawScene(scene2D);
 	}
-	/*if((<HTMLInputElement>document.getElementById("doorRight")).select){
-		if(indexRemoveRoom!=-1){
-			scene2D.rooms[indexRemoveRoom].addDoor("right",0.3);
-			main.drawScene(scene2D);
-		}
-	}
-	if((<HTMLInputElement>document.getElementById("doorLeft")).select){
-		if(indexRemoveRoom!=-1){
-			console.log("selected!!");
-			scene2D.rooms[indexRemoveRoom].addDoor("left",50);
-			main.drawScene(scene2D);
-		}
+	
+});
 
+removeWindowHTMLInput.addEventListener("click", (event) => {
+	event.preventDefault();
+	if(indexRemoveRoom!=-1){
+		let direction = (<HTMLInputElement>document.getElementById("doorOptions")).value;
+		scene2D.rooms[indexRemoveRoom].removeWindow(direction,0.1,clickedX,clickedY);
+		main.drawScene(scene2D);
 	}
-	if((<HTMLInputElement>document.getElementById("doorUpper")).select){
-		if(indexRemoveRoom!=-1){
-			scene2D.rooms[indexRemoveRoom].addDoor("upper",0.3);
-			main.drawScene(scene2D);
-		}
+});
+addWindowHTMLInput.addEventListener("click", (event) => {
+	event.preventDefault();
 
+	if (indexRemoveRoom != -1) {
+		let direction = (<HTMLInputElement>document.getElementById("doorOptions")).value;
+		scene2D.rooms[indexRemoveRoom].addWindow(direction,0.1,clickedX,clickedY);
+		main.drawScene(scene2D);
 	}
-	if((<HTMLInputElement>document.getElementById("doorLower")).select){
-		if(indexRemoveRoom!=-1){
-			scene2D.rooms[indexRemoveRoom].addDoor("lower",0.3);
-			main.drawScene(scene2D);
-		}
-
-	}*/
+	
 });
 
 main.subscribeClick((x, y) => {

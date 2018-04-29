@@ -442,13 +442,13 @@ export class Main {
 							vec4.fromValues(scene.rooms[i].squares[0].rightLowerCoordinate[0], scene.rooms[i].squares[0].rightLowerCoordinate[1]
 								, scene.rooms[i].squares[0].rightLowerCoordinate[2], 1.0));
 						console.log("E " + screenPointFrom[0] + " " + screenPointFrom[1]);
-						ctx.font = (10 * scene.rooms[i].height) + "px Arial";
+						//ctx.font = (10 * scene.rooms[i].height) + "px Arial";
+						ctx.font = 12 + "px Arial";
+						ctx.fillText(scene.rooms[i].roomName + "", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) - 6);
 
-						ctx.fillText(scene.rooms[i].roomName + "", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 2.4);
+						ctx.fillText(scene.rooms[i].squareMeter + " m2 ", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) + 6);
 
-						ctx.fillText(scene.rooms[i].squareMeter + " m2 ", (screenPointFrom[0] + screenPointTo[0]) / 2, (screenPointFrom[1] + screenPointTo[1]) / 1.70);
 
-						
 						//falak
 						for (let j = 0; j < scene.rooms[i].squares.length; j++) {
 							for (let k = 0; k < scene.rooms[i].squares[j].triangles.length; k++) {
@@ -517,6 +517,68 @@ export class Main {
 							for (let k = 0; k < scene.rooms[i].room_doors[j].triangles.length; k++) {
 
 								let buffers = this.initBuffers(scene.rooms[i].room_doors[j].triangles[k].getVerticesArray(), scene.rooms[i].room_doors[j].triangles[k].getColorArray());
+
+								{
+									const numComponents = 3;
+									const type = this.gl.FLOAT;
+									const normalize = false;
+									const stride = 0;
+									const offset = 0;
+
+									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+									this.gl.vertexAttribPointer(
+										this.colorProgramInfo.attribLocations.vertexPosition,
+										numComponents,
+										type,
+										normalize,
+										stride,
+										offset);
+									this.gl.enableVertexAttribArray(
+										this.colorProgramInfo.attribLocations.vertexPosition);
+								}
+
+								{
+									const numComponents = 4;
+									const type = this.gl.FLOAT;
+									const normalize = false;
+									const stride = 0;
+									const offset = 0;
+									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+									this.gl.vertexAttribPointer(
+										this.colorProgramInfo.attribLocations.vertexColor,
+										numComponents,
+										type,
+										normalize,
+										stride,
+										offset);
+									this.gl.enableVertexAttribArray(
+										this.colorProgramInfo.attribLocations.vertexColor);
+								}
+
+								this.gl.useProgram(this.colorProgramInfo.program);
+
+								this.gl.uniformMatrix4fv(
+									this.colorProgramInfo.uniformLocations.projectionMatrix,
+									false,
+									scene.projectionMatrix);
+								this.gl.uniformMatrix4fv(
+									this.colorProgramInfo.uniformLocations.modelViewMatrix,
+									false,
+									scene.modelViewMatrix);
+
+								{
+									const offset = 0;
+									let vertexCount = 4;
+									this.gl.drawArrays(this.gl.TRIANGLES, offset, 3);
+								}
+
+							}
+						}
+						//ablak
+						for (let j = 0; j < scene.rooms[i].room_windows.length; j++) {
+							for (let k = 0; k < scene.rooms[i].room_windows[j].triangles.length; k++) {
+
+								let buffers = this.initBuffers(scene.rooms[i].room_windows[j].triangles[k].getVerticesArray(), scene.rooms[i].room_windows[j].triangles[k].getColorArray());
 
 								{
 									const numComponents = 3;
