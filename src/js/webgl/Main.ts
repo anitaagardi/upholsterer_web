@@ -851,6 +851,13 @@ export class Main {
 			clickCallback(x, y);
 		}, false);
 	}
+
+	texture2D(textureOptions, indexRoom, scene?: Scene) {
+
+
+
+	}
+
 	/*
 	drawGrids() {
 		var vertices = [

@@ -50,6 +50,7 @@ let removeDoorHTMLInput = (<HTMLInputElement>document.getElementById("removeDoor
 
 let addWindowHTMLInput = (<HTMLInputElement>document.getElementById("addWindow"));
 let removeWindowHTMLInput = (<HTMLInputElement>document.getElementById("removeWindow"));
+let textureHTMLInput = (<HTMLInputElement>document.getElementById("texture"));
 addNewRoomHTMLInput.addEventListener("click", (event) => {
 	event.preventDefault();
 	console.log("addnewRoom");
@@ -157,6 +158,13 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	(<HTMLInputElement>document.getElementById("roomBorder")).value = "";
 	indexRemoveRoom = -1;
 	//main.drawScene(scene2D);
+});
+
+
+textureHTMLInput.addEventListener("click", (event) => {
+	event.preventDefault();
+	let textureOptions= (<HTMLInputElement>document.getElementById("textureOptions")).value;
+	main.texture2D(textureOptions,indexRemoveRoom);
 });
 
 removeRoomHTMLInput.addEventListener("click", (event) => {

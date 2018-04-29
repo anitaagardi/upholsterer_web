@@ -227,6 +227,7 @@ export class Scene2D implements Scene {
 		this.roomSource.next();
 	}
 	
+	
 
 	get projectionMatrix(): mat4 {
 		return this.m_projectionMatrix;
