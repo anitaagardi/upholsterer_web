@@ -1,7 +1,6 @@
 body {
     margin:0;
 }
-
 .container {
     position: relative;
 }
@@ -13,7 +12,6 @@ body {
     z-index: 10;
     pointer-events: none;
 }
-
 .editor {
     display:flex;
     flex-direction: row;
@@ -43,16 +41,12 @@ button:hover {
 }
 .formText{
     text-transform: uppercase;
-
-
 }
-
 .banner {
     height:60px;
     width:100%;
     background-color: #B6AFAE
 }
-
 #glCanvas {
     border: 10px solid #272727;
 }
@@ -63,11 +57,9 @@ ul {
     overflow: hidden;
     background-color: #333;
 }
-
 li {
     float: left;
 }
-
 li {
     display: block;
     color: white;
@@ -75,11 +67,9 @@ li {
     padding: 22px 25px;
     text-decoration: none;
 }
-
 li :hover:not(.active) {
     background-color: #111;
 }
-
 .active {
     background-color: #4CAF50;
 }
