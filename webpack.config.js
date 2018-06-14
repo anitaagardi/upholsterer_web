@@ -72,12 +72,16 @@ module.exports = {
       new CleanWebpackPlugin(['dist']),
       new CopyWebpackPlugin([
 			{ 
-			    from: 'src/index.html',
+			  from: 'src/index.html',
 				to: '.'
       },
 
       { 
         from: 'src/grid.jpg',
+        to: '.'
+      },
+      { 
+        from: 'src/grid2.jpg',
         to: '.'
       },
       { 

@@ -500,4 +500,5 @@ export class Room {
 		}
 		rooms.push(this);
 	}
+
 }

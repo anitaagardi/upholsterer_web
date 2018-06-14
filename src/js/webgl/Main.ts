@@ -6,7 +6,17 @@ import { fragmentShaderSource as colorFragmentShaderSource } from './shaders/col
 import { vertexShaderSource as colorVertexShaderSource } from './shaders/color/vertex';
 import { fragmentShaderSource as textureFragmentShaderSource } from './shaders/texture/fragment';
 import { vertexShaderSource as textureVertexShaderSource } from './shaders/texture/vertex';
+import { Triangle } from './Triangle';
 import { Scene } from './Scene';
+import { Observable } from 'rxjs';
+
+import * as Rx from 'rxjs/Rx';
+import { Visitor } from './Visitor';
+import { Component } from './Component';
+import { MultiLineText } from './MultiLineText';
+import { LineGrid } from './LineGrid';
+import { TexturedGrid } from './TexturedGrid';
+
 interface ClickCallback {
 	(x, y): void;
 }
@@ -16,7 +26,7 @@ interface ClickCallback {
 	The class contains the openGL settings
 	The class contains the shader programs, the drawing logic of the elements of the scene
 */
-export class Main {
+export class Main implements Visitor {
 
 	private canvas: HTMLCanvasElement;
 	private gl: WebGL2RenderingContext;
@@ -26,6 +36,13 @@ export class Main {
 	private colorProgramInfo;
 	private textureShaderProgram;
 	private textureProgramInfo;
+
+	private dragged: boolean;
+	private lastX: number;
+	private lastY: number;
+
+	private sceneDraggingEvent: Observable<any>;
+
 	constructor(htmlCanvasElementId: string) {
 		this.canvas = document.querySelector(htmlCanvasElementId);
 		this.gl = this.canvas.getContext('webgl2') as WebGL2RenderingContext;
@@ -58,7 +75,110 @@ export class Main {
 				uSampler: this.gl.getUniformLocation(this.textureShaderProgram, 'uSampler'),
 			},
 		};
+
+		let
+			mousedown = Rx.Observable.fromEvent(this.canvas, 'mousedown'),
+			mousemove = Rx.Observable.fromEvent(document, 'mousemove'),
+			mouseup = Rx.Observable.fromEvent(document, 'mouseup');
+
+		//Detect mouse down; 
+		//While down, listen for mouse move and mouse up;
+		//When mouse up: stop listening for moves and ups.
+		this.sceneDraggingEvent = mousedown.flatMap((md: any) => {
+			// Capture mouse down offset position
+			md.preventDefault();
+
+			this.lastX = md.clientX,
+				this.lastY = md.clientY;
+
+			// B1. Track mouse position differentials using mousemove until we hear a mouseup
+			return mousemove.map((mm: any) => {
+				mm.preventDefault();
+
+				//chrome simultaneously mousemove and click issue
+				if (!this.dragged && (mm.clientX !== this.lastX || mm.clientY !== this.lastY)) {
+					this.dragged = true;
+				}
+
+				if (this.dragged) {
+					let prevX = this.lastX;
+					let prevY = this.lastY;
+
+					this.lastX = mm.clientX;
+					this.lastY = mm.clientY;
+
+					return {
+						prevPos: {
+							x: prevX,
+							y: prevY
+						},
+						currentPos: {
+							x: mm.clientX,
+							y: mm.clientY
+						}
+					};
+				} else {
+					return { prevPos: null, currentPos: null };
+				}
+				// C. stop the drag when mousup
+			}).takeUntil(mouseup);
+		});
+
+		// Subscribe to mousemove's mousedrag stream:
+		// B2. Update draggable's position from the mousedrag stream of events
+		/*mousedrag.subscribe((pos: any) => {
+
+			if (pos) {
+				//console.log("FRONT");
+				let xoffset = pos.x - this.lastX;
+				let yoffset = this.lastY - pos.y;
+
+				//console.log(xoffset + " " + yoffset);
+				this.lastX = pos.x;
+				this.lastY = pos.y;
+
+				let sensitivity = 0.05;
+				xoffset *= sensitivity;
+				yoffset *= sensitivity;
+
+				this.yaw += xoffset;
+				this.pitch += yoffset;
+
+				//console.log(this.yaw + " " + this.pitch);
+
+				if (this.pitch > 89.0) {
+					this.pitch = 89.0;
+				}
+				if (this.pitch < -89.0) {
+					this.pitch = -89.0;
+
+				}
+
+				let yawRadian = this.yaw * Math.PI / 180.0;
+				let pitchRadian = this.pitch * Math.PI / 180.0;
+
+
+				let front = vec3.fromValues(Math.cos(yawRadian) * Math.cos(pitchRadian),
+					Math.sin(pitchRadian), Math.sin(yawRadian) * Math.cos(pitchRadian));
+
+
+
+				//console.log(front);
+				this.scene.lookAt(vec3.fromValues(0, 0, 0), front, vec3.fromValues(0, 1, 0));
+				this.drawScene(this.scene);
+		
+			}
+
+		});*/
+
+		mouseup.subscribe((event) => {
+			this.dragged = false;
+		})
+
 	}
+
+
+
 	//subscribe to an event
 	//if we add anything to the scene, this method redraw
 	setScene = (scene: Scene) => {
@@ -170,13 +290,15 @@ export class Main {
 			let grid = scene.getGrid();
 			if (grid) {
 				if (scene instanceof Scene3D) {
+					let scalar = 2048;
 					let vecs = grid[0];
 					let buffers = this.initBuffersTexture(vecs, [
-						2048.0, 2048.0,
-						2048.0, 0.0,
+						scalar, scalar,
+						scalar, 0.0,
 						0.0, 0.0,
-						0, 2048.0
+						0, scalar
 					], [0, 1, 2, 0, 2, 3]);
+
 					const texture = this.loadTexture(image);
 					{
 						const numComponents = 3;
@@ -224,52 +346,88 @@ export class Main {
 						false,
 						scene.getModelViewMatrix());
 					this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
+
+
+					let gridHeight = Math.abs((vecs[2] - vecs[5]) / 2048);
+					let gridWidth = Math.abs((vecs[6] - vecs[3]) / 2048);
+
+					console.log(`grid height: ${(vecs[2] - vecs[5]) / 2048} `);
+					console.log(`grid width: ${(vecs[6] - vecs[3]) / 2048} `);
+
+					{
+
+						console.log([
+							vecs[3] + 1023 * gridWidth, vecs[1] + 0.00001, vecs[5],
+							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5],
+							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5] - 2.5 * gridHeight,
+						])
+
+						let buffers = this.initBuffers([
+							vecs[3] + 1023 * gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5],
+							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5],
+							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5] - 2.5 * gridHeight,
+						], [0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0,]);
+
+						{
+							const numComponents = 3;
+							const type = this.gl.FLOAT;
+							const normalize = false;
+							const stride = 0;
+							const offset = 0;
+
+							this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+							this.gl.vertexAttribPointer(
+								this.colorProgramInfo.attribLocations.vertexPosition,
+								numComponents,
+								type,
+								normalize,
+								stride,
+								offset);
+							this.gl.enableVertexAttribArray(
+								this.colorProgramInfo.attribLocations.vertexPosition);
+						}
+
+						{
+							const numComponents = 4;
+							const type = this.gl.FLOAT;
+							const normalize = false;
+							const stride = 0;
+							const offset = 0;
+							this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+							this.gl.vertexAttribPointer(
+								this.colorProgramInfo.attribLocations.vertexColor,
+								numComponents,
+								type,
+								normalize,
+								stride,
+								offset);
+							this.gl.enableVertexAttribArray(
+								this.colorProgramInfo.attribLocations.vertexColor);
+						}
+
+						this.gl.useProgram(this.colorProgramInfo.program);
+
+						this.gl.uniformMatrix4fv(
+							this.colorProgramInfo.uniformLocations.projectionMatrix,
+							false,
+							scene.getProjectionMatrix());
+						this.gl.uniformMatrix4fv(
+							this.colorProgramInfo.uniformLocations.modelViewMatrix,
+							false,
+							scene.getModelViewMatrix());
+
+						{
+							const offset = 0;
+							let vertexCount = scene.getVertexCount();
+							this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
+						}
+
+					}
+
+					//2D rács
 				} else {
-					let buffers = this.initBuffers(grid[0], grid[1])
-					{
-						const numComponents = 3;
-						const type = this.gl.FLOAT;
-						const normalize = false;
-						const stride = 0;
-						const offset = 0;
-						this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-						this.gl.vertexAttribPointer(
-							this.colorProgramInfo.attribLocations.vertexPosition,
-							numComponents,
-							type,
-							normalize,
-							stride,
-							offset);
-						this.gl.enableVertexAttribArray(
-							this.colorProgramInfo.attribLocations.vertexPosition);
-					}
-					{
-						const numComponents = 4;
-						const type = this.gl.FLOAT;
-						const normalize = false;
-						const stride = 0;
-						const offset = 0;
-						this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
-						this.gl.vertexAttribPointer(
-							this.colorProgramInfo.attribLocations.vertexColor,
-							numComponents,
-							type,
-							normalize,
-							stride,
-							offset);
-						this.gl.enableVertexAttribArray(
-							this.colorProgramInfo.attribLocations.vertexColor);
-					}
-					this.gl.useProgram(this.colorProgramInfo.program);
-					this.gl.uniformMatrix4fv(
-						this.colorProgramInfo.uniformLocations.projectionMatrix,
-						false,
-						scene.getProjectionMatrix());
-					this.gl.uniformMatrix4fv(
-						this.colorProgramInfo.uniformLocations.modelViewMatrix,
-						false,
-						scene.getModelViewMatrix());
-					this.gl.drawArrays(this.gl.LINES, 0, grid[1].length / 4);
+					let grid:Component = scene.getGrid();
+					grid.accept(this);
 				}
 				if (scene instanceof Scene2D) {
 					let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
@@ -278,184 +436,135 @@ export class Main {
 					ctx.textAlign = 'center';
 					ctx.textBaseline = 'top';
 					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-					for (let i = 0; i < scene.getRooms().length; i++) {
-						let screenPointFrom = scene.convert3DPointToScreen(
-							vec4.fromValues(scene.getRooms()[i].getSquares()[0].getLeftUpperCoordinate()[0], scene.getRooms()[i].getSquares()[0].getLeftUpperCoordinate()[1]
-								, scene.getRooms()[i].getSquares()[0].getLeftUpperCoordinate()[2], 1.0));
-						let screenPointTo = scene.convert3DPointToScreen(
-							vec4.fromValues(scene.getRooms()[i].getSquares()[0].getRightLowerCoordinate()[0], scene.getRooms()[i].getSquares()[0].getRightLowerCoordinate()[1]
-								, scene.getRooms()[i].getSquares()[0].getRightLowerCoordinate()[2], 1.0));
-						ctx.font = 12 + "px Arial";
-						ctx.fillText(scene.getRooms()[i].getRoomName() + "", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) - 6);
-						ctx.fillText(scene.getRooms()[i].getSquareMeter() + " m2 ", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) + 6);
-						//falak
-						for (let j = 0; j < scene.getRooms()[i].getSquares().length; j++) {
-							for (let k = 0; k < scene.getRooms()[i].getSquares()[j].getTriangles().length; k++) {
-								let buffers = this.initBuffers(scene.getRooms()[i].getSquares()[j].getTriangles()[k].getVerticesArray(), scene.getRooms()[i].getSquares()[j].getTriangles()[k].getColorArray());
-								{
-									const numComponents = 3;
-									const type = this.gl.FLOAT;
-									const normalize = false;
-									const stride = 0;
-									const offset = 0;
-									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-									this.gl.vertexAttribPointer(
-										this.colorProgramInfo.attribLocations.vertexPosition,
-										numComponents,
-										type,
-										normalize,
-										stride,
-										offset);
-									this.gl.enableVertexAttribArray(
-										this.colorProgramInfo.attribLocations.vertexPosition);
-								}
-								{
-									const numComponents = 4;
-									const type = this.gl.FLOAT;
-									const normalize = false;
-									const stride = 0;
-									const offset = 0;
-									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
-									this.gl.vertexAttribPointer(
-										this.colorProgramInfo.attribLocations.vertexColor,
-										numComponents,
-										type,
-										normalize,
-										stride,
-										offset);
-									this.gl.enableVertexAttribArray(
-										this.colorProgramInfo.attribLocations.vertexColor);
-								}
-								this.gl.useProgram(this.colorProgramInfo.program);
-								this.gl.uniformMatrix4fv(
-									this.colorProgramInfo.uniformLocations.projectionMatrix,
-									false,
-									scene.getProjectionMatrix());
-								this.gl.uniformMatrix4fv(
-									this.colorProgramInfo.uniformLocations.modelViewMatrix,
-									false,
-									scene.getModelViewMatrix());
-								{
-									const offset = 0;
-									let vertexCount = scene.getVertexCount();
-									this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
-								}
-							}
-						}
-						//ajtó
-						for (let j = 0; j < scene.getRooms()[i].getRoomDoors().length; j++) {
-							for (let k = 0; k < scene.getRooms()[i].getRoomDoors()[j].getTriangles().length; k++) {
-								let buffers = this.initBuffers(scene.getRooms()[i].getRoomDoors()[j].getTriangles()[k].getVerticesArray(), scene.getRooms()[i].getRoomDoors()[j].getTriangles()[k].getColorArray());
-								{
-									const numComponents = 3;
-									const type = this.gl.FLOAT;
-									const normalize = false;
-									const stride = 0;
-									const offset = 0;
-									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-									this.gl.vertexAttribPointer(
-										this.colorProgramInfo.attribLocations.vertexPosition,
-										numComponents,
-										type,
-										normalize,
-										stride,
-										offset);
-									this.gl.enableVertexAttribArray(
-										this.colorProgramInfo.attribLocations.vertexPosition);
-								}
-								{
-									const numComponents = 4;
-									const type = this.gl.FLOAT;
-									const normalize = false;
-									const stride = 0;
-									const offset = 0;
-									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
-									this.gl.vertexAttribPointer(
-										this.colorProgramInfo.attribLocations.vertexColor,
-										numComponents,
-										type,
-										normalize,
-										stride,
-										offset);
-									this.gl.enableVertexAttribArray(
-										this.colorProgramInfo.attribLocations.vertexColor);
-								}
-								this.gl.useProgram(this.colorProgramInfo.program);
-								this.gl.uniformMatrix4fv(
-									this.colorProgramInfo.uniformLocations.projectionMatrix,
-									false,
-									scene.getProjectionMatrix());
-								this.gl.uniformMatrix4fv(
-									this.colorProgramInfo.uniformLocations.modelViewMatrix,
-									false,
-									scene.getModelViewMatrix());
-								{
-									const offset = 0;
-									let vertexCount = 4;
-									this.gl.drawArrays(this.gl.TRIANGLES, offset, 3);
-								}
-							}
-						}
-						//ablak
-						for (let j = 0; j < scene.getRooms()[i].getRoomWindows().length; j++) {
-							for (let k = 0; k < scene.getRooms()[i].getRoomWindows()[j].getTriangles().length; k++) {
-								let buffers = this.initBuffers(scene.getRooms()[i].getRoomWindows()[j].getTriangles()[k].getVerticesArray(), scene.getRooms()[i].getRoomWindows()[j].getTriangles()[k].getColorArray());
-								{
-									const numComponents = 3;
-									const type = this.gl.FLOAT;
-									const normalize = false;
-									const stride = 0;
-									const offset = 0;
-									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-									this.gl.vertexAttribPointer(
-										this.colorProgramInfo.attribLocations.vertexPosition,
-										numComponents,
-										type,
-										normalize,
-										stride,
-										offset);
-									this.gl.enableVertexAttribArray(
-										this.colorProgramInfo.attribLocations.vertexPosition);
-								}
-								{
-									const numComponents = 4;
-									const type = this.gl.FLOAT;
-									const normalize = false;
-									const stride = 0;
-									const offset = 0;
-									this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
-									this.gl.vertexAttribPointer(
-										this.colorProgramInfo.attribLocations.vertexColor,
-										numComponents,
-										type,
-										normalize,
-										stride,
-										offset);
-									this.gl.enableVertexAttribArray(
-										this.colorProgramInfo.attribLocations.vertexColor);
-								}
-								this.gl.useProgram(this.colorProgramInfo.program);
-								this.gl.uniformMatrix4fv(
-									this.colorProgramInfo.uniformLocations.projectionMatrix,
-									false,
-									scene.getProjectionMatrix());
-								this.gl.uniformMatrix4fv(
-									this.colorProgramInfo.uniformLocations.modelViewMatrix,
-									false,
-									scene.getModelViewMatrix());
-								{
-									const offset = 0;
-									let vertexCount = 4;
-									this.gl.drawArrays(this.gl.TRIANGLES, offset, 3);
-								}
-							}
-						}
+
+					let component: Component[] = this.scene.getDrawingRooms();
+					for (let i = 0; i < component.length; i++) {
+						//this.drawColoredTriangle(triangles[i]);
+						component[i].accept(this);
 					}
 				}
 			}
 		};
-		image.src = "grid.jpg";
+		image.src = "grid2.jpg";
 	}
+
+	drawMultiLineText(multiLineText: MultiLineText) {
+		let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
+		var ctx = textCanvas.getContext("2d");
+		ctx.font = 12 + "px Arial";
+		//ctx.fillText(scene.getRooms()[i].getRoomName() + "", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) - 6);
+		//ctx.fillText(scene.getRooms()[i].getSquareMeter() + " m2 ", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) + 6);
+		for (let i = 0; i < multiLineText.getLines().length; i++) {
+			ctx.fillText(multiLineText.getLines()[i], multiLineText.getX()[i], multiLineText.getY()[i]);
+		}
+	}
+
+	drawLineGrid(lineGrid: LineGrid) {
+		let buffers = this.initBuffers(lineGrid.getVertices(), lineGrid.getColors());
+		{
+			const numComponents = 3;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+			this.gl.vertexAttribPointer(
+				this.colorProgramInfo.attribLocations.vertexPosition,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.colorProgramInfo.attribLocations.vertexPosition);
+		}
+		{
+			const numComponents = 4;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+			this.gl.vertexAttribPointer(
+				this.colorProgramInfo.attribLocations.vertexColor,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.colorProgramInfo.attribLocations.vertexColor);
+		}
+		this.gl.useProgram(this.colorProgramInfo.program);
+		this.gl.uniformMatrix4fv(
+			this.colorProgramInfo.uniformLocations.projectionMatrix,
+			false,
+			this.scene.getProjectionMatrix());
+		this.gl.uniformMatrix4fv(
+			this.colorProgramInfo.uniformLocations.modelViewMatrix,
+			false,
+			this.scene.getModelViewMatrix());
+		this.gl.drawArrays(this.gl.LINES, 0, lineGrid.getColors().length / 4);
+	}
+
+	drawTexturedGrid(texturedGrid: TexturedGrid) {
+
+	}
+
+	drawTriangle(triangle: Triangle) {
+		console.log("HAROMSZOG");
+		let buffers = this.initBuffers(triangle.getVerticesArray(), triangle.getColorArray());
+		{
+			const numComponents = 3;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+			this.gl.vertexAttribPointer(
+				this.colorProgramInfo.attribLocations.vertexPosition,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.colorProgramInfo.attribLocations.vertexPosition);
+		}
+		{
+			const numComponents = 4;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+			this.gl.vertexAttribPointer(
+				this.colorProgramInfo.attribLocations.vertexColor,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.colorProgramInfo.attribLocations.vertexColor);
+		}
+		this.gl.useProgram(this.colorProgramInfo.program);
+		this.gl.uniformMatrix4fv(
+			this.colorProgramInfo.uniformLocations.projectionMatrix,
+			false,
+			this.scene.getProjectionMatrix());
+		this.gl.uniformMatrix4fv(
+			this.colorProgramInfo.uniformLocations.modelViewMatrix,
+			false,
+			this.scene.getModelViewMatrix());
+		{
+			const offset = 0;
+			let vertexCount = 4;
+			this.gl.drawArrays(this.gl.TRIANGLES, offset, 3);
+		}
+	}
+
+
 	initShaderProgram(vsSource: string, fsSource: string): any {
 		const vertexShader = this.loadShader(this.gl.VERTEX_SHADER, vsSource);
 		const fragmentShader = this.loadShader(this.gl.FRAGMENT_SHADER, fsSource);
@@ -489,6 +598,11 @@ export class Main {
 			clickCallback(x, y);
 		}, false);
 	}
+
 	texture2D(textureOptions, indexRoom, scene?: Scene) {
+	}
+
+	onDragging() {
+		return this.sceneDraggingEvent;
 	}
 }

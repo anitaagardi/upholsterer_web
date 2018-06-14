@@ -1,9 +1,11 @@
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
+import { Component } from './Component';
+import { Visitor } from './Visitor';
 /*
 The triangle is the atomic unit.
 The rooms, doors, windows consits of squares, and the squares consits of triangles.
 */
-export class Triangle {
+export class Triangle implements Component{
 	//the vertices of the triangle
 	private vertices: vec3[] = [];
 	//the color of the triangle
@@ -16,6 +18,7 @@ export class Triangle {
 		this.color = color;
 	}
 	//modelViewMatrix: to world
+	//a ray with d direction from p point intersect this triangle
 	rayIntersectsTriangle(p: vec3, d: vec3, modelViewMatrix: mat4): boolean {
 		const epsilon = 0.00001;
 		let v0 = this.vertices[0];
@@ -59,7 +62,7 @@ export class Triangle {
 			// but not a ray intersection
 			return false;
 	}
-	//the vertices of the triangle
+	//the vertices of the triangle fitting opengl input format
 	getVerticesArray() {
 		return [
 			this.vertices[0][0], this.vertices[0][1], this.vertices[0][2],
@@ -67,12 +70,16 @@ export class Triangle {
 			this.vertices[2][0], this.vertices[2][1], this.vertices[2][2]
 		];
 	}
-	//the color of the triangle
+	//the color of the triangle fitting opengl input format
 	getColorArray() {
 		return [
 			this.color[0], this.color[1], this.color[2], this.color[3],
 			this.color[0], this.color[1], this.color[2], this.color[3],
 			this.color[0], this.color[1], this.color[2], this.color[3]
 		];
+	}
+
+	accept(v:Visitor) {
+		v.drawTriangle(this);		
 	}
 }

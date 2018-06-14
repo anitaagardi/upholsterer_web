@@ -32,4 +32,6 @@ export interface Scene {
     //the rooms consists of triangles (because of the basic room and the border, door, window)
     getTriangles(): Triangle[];
     getVertexCount(): number;
+
+    getDrawingRooms():any;
 }

@@ -3,6 +3,8 @@ import { Triangle } from './Triangle';
 import { Square } from './Square';
 import { Room } from './Room';
 import { Scene } from './Scene';
+import { Camera } from './Camera';
+
 import { Subject } from 'rxjs/Subject';
 export class Scene3D implements Scene {
 	//the projection matrix of the 3d scene
@@ -11,6 +13,9 @@ export class Scene3D implements Scene {
 	private modelViewMatrix: mat4;
 	//the view matrix of the 3d scene
 	private viewMatrix: mat4;
+
+	private camera:Camera;
+
 	//the width of the 3d scene
 	private width;
 	//the height of the 3d scene
@@ -36,8 +41,13 @@ export class Scene3D implements Scene {
 	private vertexCount = 3;
 	private roomSource = new Subject<any>();
 	public roomSource$ = this.roomSource.asObservable();
+
+	private translateZ;
+
 	//the initializaton
 	constructor(width, height, fieldOfViewDegree, zNear, zFar, translateZ, grid) {
+		this.translateZ = translateZ;
+
 		this.projectionMatrix = mat4.create();
 		this.grid = grid;
 		this.width = width;
@@ -59,13 +69,22 @@ export class Scene3D implements Scene {
 			this.modelViewMatrix,
 			[0.0, 0.0, translateZ]);
 	}
-	lookAt(eye: vec3, center: vec3, up: vec3) {
+	/*lookAt(eye: vec3, center: vec3, up: vec3) {
+
+		this.modelViewMatrix = mat4.create();
+
+		mat4.translate(this.modelViewMatrix,
+			this.modelViewMatrix,
+			[0.0, 0.0, this.translateZ]);
+
 		let cameraMatrix = mat4.create();
 		mat4.lookAt(cameraMatrix, eye, center, up);
+
 		this.viewMatrix = mat4.create();
 		mat4.invert(this.viewMatrix, cameraMatrix);
+
 		mat4.multiply(this.modelViewMatrix, this.viewMatrix, this.modelViewMatrix);
-	}
+	}*/
 	convert3DPointToScreen(point: vec4): number[] {
 		let multipliedMatrix = mat4.create();
 		mat4.multiply(multipliedMatrix, this.projectionMatrix, this.modelViewMatrix);
@@ -107,6 +126,14 @@ export class Scene3D implements Scene {
 		return this.projectionMatrix;
 	}
 	getModelViewMatrix(): mat4 {
+		this.modelViewMatrix = mat4.create();
+		mat4.translate(this.modelViewMatrix,
+			this.modelViewMatrix,
+			[0.0, 0.0, this.translateZ]);
+
+		this.camera.lookAt();
+		//console.log(this.camera.getViewMatrix());
+		mat4.multiply(this.modelViewMatrix, this.camera.getViewMatrix(), this.modelViewMatrix);
 		return this.modelViewMatrix;
 	}
 	getPositions(): number[] {
@@ -123,6 +150,12 @@ export class Scene3D implements Scene {
 	}
 	getRooms(): Room[] {
 		return this.rooms;
+	}
+	getCamera():Camera {
+		return this.camera;
+	}
+	setCamera(camera:Camera) {
+		this.camera = camera;
 	}
 	isGrid(): boolean {
 		return this.grid;
@@ -178,5 +211,8 @@ export class Scene3D implements Scene {
 		return [vertices, colors];
 	}
 	removeRoom(indexRemoveRoom: number) {
+	}
+	getDrawingRooms() {
+		
 	}
 }

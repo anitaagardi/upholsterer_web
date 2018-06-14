@@ -4,6 +4,9 @@ import { Square } from './Square';
 import { Room } from './Room';
 import { Scene } from './Scene';
 import { Subject } from 'rxjs/Subject';
+import { Component } from './Component';
+import { MultiLineText } from './MultiLineText';
+import { LineGrid } from './LineGrid';
 export class Scene2D implements Scene {
 	//the projection matrix of the scene
 	private projectionMatrix: mat4;
@@ -95,11 +98,11 @@ export class Scene2D implements Scene {
 		this.rooms.splice(indexRemoveRoom, 1);
 		this.roomSource.next();
 	}
-	
+
 	getProjectionMatrix(): mat4 {
 		return this.projectionMatrix;
 	}
-	
+
 	getModelViewMatrix(): mat4 {
 		return this.modelViewMatrix;
 	}
@@ -118,6 +121,68 @@ export class Scene2D implements Scene {
 	getRooms(): Room[] {
 		return this.rooms;
 	}
+
+	getDrawingRooms(): Component[] {
+		let components: Component[] = [];
+		for (let i = 0; i < this.rooms.length; i++) {
+			//wall
+			for (let j = 0; j < this.rooms[i].getSquares().length; j++) {
+				for (let k = 0; k < this.rooms[i].getSquares()[j].getTriangles().length; k++) {
+
+				}
+				components = [...components, ...this.rooms[i].getSquares()[j].getTriangles()];
+			}
+
+			//door
+			for (let j = 0; j < this.rooms[i].getRoomDoors().length; j++) {
+				for (let k = 0; k < this.rooms[i].getRoomDoors()[j].getTriangles().length; k++) {
+
+				}
+				components = [...components, ...this.rooms[i].getRoomDoors()[j].getTriangles()];
+			}
+
+			//window
+			for (let j = 0; j < this.rooms[i].getRoomWindows().length; j++) {
+				for (let k = 0; k < this.rooms[i].getRoomWindows()[j].getTriangles().length; k++) {
+
+				}
+				components = [...components, ...this.rooms[i].getRoomWindows()[j].getTriangles()];
+			}
+			//text
+			let screenPointFrom = this.convert3DPointToScreen(
+				vec4.fromValues(
+					this.rooms[i].getSquares()[0].getLeftUpperCoordinate()[0],
+					this.rooms[i].getSquares()[0].getLeftUpperCoordinate()[1],
+					this.rooms[i].getSquares()[0].getLeftUpperCoordinate()[2],
+					1.0)
+			);
+			let screenPointTo = this.convert3DPointToScreen(
+				vec4.fromValues(
+					this.rooms[i].getSquares()[0].getRightLowerCoordinate()[0],
+					this.rooms[i].getSquares()[0].getRightLowerCoordinate()[1],
+					this.rooms[i].getSquares()[0].getRightLowerCoordinate()[2],
+					1.0)
+			);
+
+			let lines = [];
+			let xCoords = [];
+			let yCoords = [];
+			lines.push(this.rooms[i].getRoomName() + "");
+			lines.push(this.rooms[i].getSquareMeter() + " m2 ");
+
+			xCoords.push((screenPointFrom[0] + screenPointTo[0]) / 2);
+			xCoords.push((screenPointFrom[0] + screenPointTo[0]) / 2);
+
+			yCoords.push(((screenPointFrom[1] + screenPointTo[1]) / 2) - 6);
+			yCoords.push(((screenPointFrom[1] + screenPointTo[1]) / 2) + 6);
+			
+			let multiLineText:MultiLineText = new MultiLineText(lines,xCoords, yCoords);
+
+			components = [ ...components, multiLineText];
+		}
+		return components;
+	}
+
 	isGrid(): boolean {
 		return this.grid;
 	}
@@ -126,7 +191,7 @@ export class Scene2D implements Scene {
 	}
 	//this method creates the gid 
 	//one grid piece means one square meter
-	getGrid(): any {
+	getGrid(): Component {
 		var colors = [];
 		var vertices = [];
 		for (var i = 0; i < 2000; i = i + 50) {
@@ -143,6 +208,8 @@ export class Scene2D implements Scene {
 			vertices = vertices.concat([v[0], v[1], v[2]]);
 			colors = colors.concat([0, 0, 0, 1.0]);
 		}
-		return [vertices, colors];
+		//return [vertices, colors];
+
+		return new LineGrid(vertices, colors);
 	}
 }

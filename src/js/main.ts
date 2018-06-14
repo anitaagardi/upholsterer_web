@@ -4,6 +4,8 @@ import { Scene3D } from './webgl/Scene3D';
 import { Triangle } from './webgl/Triangle';
 import { Square } from './webgl/Square';
 import { Room } from './webgl/Room';
+import { Camera } from './webgl/Camera';
+
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 let scene2D = new Scene2D(1000, 800, 45, 0.1, 100, -5, true);
 let scene3D = new Scene3D(1000, 800, 45, 0.1, 100, 0, true);
@@ -12,16 +14,94 @@ let points: vec3[] = [];
 let indexRemoveRoom = -1;
 let clickedX;
 let clickedY;
-scene3D.lookAt(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, -1), vec3.fromValues(0, 1, 0));
+
+/* yaw is initialized to -90.0 degrees since a yaw of 0.0 results 
+   in a direction vector pointing to the right so we initially rotate a bit to the left.
+*/
+let yaw: number = -90.0;
+let pitch: number = 0.0;
+
+let isIn2DMode: boolean = true;
+let isIn3DMode: boolean = false;
+
+let camera: Camera = new Camera(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, -1), vec3.fromValues(0, 1, 0));
+
+//scene3D.lookAt(vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, -1), vec3.fromValues(0, 1, 0));
 main.setScene(scene2D);
+
+main.onDragging().subscribe(({ prevPos, currentPos }) => {
+	if (isIn3DMode && currentPos) {
+		let xoffset = currentPos.x - prevPos.x;
+		let yoffset = prevPos.y - currentPos.y;
+
+		let sensitivity = 0.05;
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+
+		yaw += xoffset;
+		pitch += yoffset;
+
+		if (pitch > 89.0) {
+			pitch = 89.0;
+		}
+		if (pitch < -89.0) {
+			pitch = -89.0;
+		}
+
+		camera.rotate(yaw, pitch);
+		main.drawScene();
+	}
+});
+
+document.addEventListener('keydown',
+	function press(e) {
+		//event.preventDefault();
+		//WASD control
+		if( e.keyCode === 87 /* w */) {
+			
+		}
+
+		if(e.keyCode === 68 /* d */) {
+			
+		}
+
+		if(e.keyCode === 83 /* s */) {
+
+		}
+
+		if(e.keyCode === 65 /* a */) {
+
+		}
+
+		//arrows control
+		if (e.keyCode === 38 /* up */ || e.keyCode === 90 /* z */) {
+			camera.pedestal(0.001);
+			main.drawScene();
+		}
+		if (e.keyCode === 39 /* right */) {
+		}
+		if (e.keyCode === 40 /* down */) {
+			camera.pedestal(-0.001);
+			main.drawScene();
+		}
+		if (e.keyCode === 37 /* left */ || e.keyCode === 81 /* q */) {
+
+		}
+	});
+
 main.drawScene();
 let select2D = (<HTMLInputElement>document.getElementById("2d"));
 let select3D = (<HTMLInputElement>document.getElementById("3d"));
 select2D.addEventListener("click", (event) => {
+	isIn2DMode = true;
+	isIn3DMode = false;
 	main.setScene(scene2D);
 	main.drawScene();
 });
 select3D.addEventListener("click", (event) => {
+	isIn2DMode = false;
+	isIn3DMode = true;
+	scene3D.setCamera(camera);
 	main.setScene(scene3D);
 	main.drawScene();
 });
@@ -85,8 +165,8 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 		//the room is exists, we would like to delete or modify the room
 		if (indexRemoveRoom != -1) {
 			let removedRoom = new Room(scene2D.getRooms()[indexRemoveRoom].getBasicSquare(), scene2D.getRooms()[indexRemoveRoom].getRoomBorder(), scene2D.getRooms()[indexRemoveRoom].getRoomName() + "", scene2D.getRooms()[indexRemoveRoom].getWidth(), scene2D.getRooms()[indexRemoveRoom].getHeight(), scene2D.getRooms()[indexRemoveRoom].getSquareMeter(), scene2D.getRooms()[indexRemoveRoom].getRoomMValues());
-			removedRoom.setRoomDoors ( scene2D.getRooms()[indexRemoveRoom].getRoomDoors());
-			removedRoom.setRoomWindows (scene2D.getRooms()[indexRemoveRoom].getRoomWindows());
+			removedRoom.setRoomDoors(scene2D.getRooms()[indexRemoveRoom].getRoomDoors());
+			removedRoom.setRoomWindows(scene2D.getRooms()[indexRemoveRoom].getRoomWindows());
 			scene2D.removeRoom(indexRemoveRoom);
 			let indexOfActualRoom2 = new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).contains(scene2D.getRooms());
 			if (indexOfActualRoom2 == -1) {
@@ -214,5 +294,5 @@ main.subscribeClick((x, y) => {
 		(<HTMLInputElement>document.getElementById("roomName")).value = scene2D.getRooms()[indexRemoveRoom].getRoomName() + "";
 		(<HTMLInputElement>document.getElementById("roomBorder")).value = scene2D.getRooms()[indexRemoveRoom].getRoomMValues()[4] + "";
 	}
-	alert(result);
+	//alert(result);
 });
