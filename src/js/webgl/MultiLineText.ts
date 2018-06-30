@@ -1,12 +1,14 @@
 import { Component } from './Component';
 import { Visitor } from './Visitor';
 
-export class MultiLineText implements Component{
+export class MultiLineText extends Component{
     private lines:string[];
     private x:number[];
     private y:number[];
 
     constructor(lines:string[], x:number[], y:number[]) {
+        super();
+        
         this.lines = [...lines];
         this.x = x;
         this.y = y;

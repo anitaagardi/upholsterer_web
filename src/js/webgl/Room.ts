@@ -1,6 +1,7 @@
 import { Square } from './Square';
 import { Triangle } from './Triangle';
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
+import { Wall } from './Wall';
 /*
 The room consist of the basic room  and the border of the room.
 The basic room consits of one Square.
@@ -41,6 +42,9 @@ export class Room {
 	private roomDoors: Square[] = [];
 	//the windows of the room
 	private roomWindows: Square[] = [];
+	
+	private walls:Wall[] = [];
+	
 	//the constructor initialize the basic square, the line size, the width and height of the room, the sqaremeter,  and other values
 	constructor(square: Square, lineSize: number, roomName: string, width: number, height: number, squareMeter: number, roomMValues: number[]) {
 		this.basicSquare = square;
@@ -50,6 +54,7 @@ export class Room {
 		this.roomHeight = height;
 		this.roomWidth = width;
 		this.roomMValues = roomMValues;
+		/*
 		let v1 = vec3.fromValues(square.getRightUpperCoordinate()[0] + lineSize, square.getRightUpperCoordinate()[1] + lineSize, 0.0);
 		let v2 = vec3.fromValues(square.getRightUpperCoordinate()[0] + lineSize, square.getRightUpperCoordinate()[1], 0.0);
 		let v3 = vec3.fromValues(square.getLeftUpperCoordinate()[0] - lineSize, square.getLeftUpperCoordinate()[1] + lineSize, 0.0);
@@ -78,6 +83,7 @@ export class Room {
 		v5 = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 		this.rightSquare = new Square();
 		this.rightSquare.createFromVec(v1, v2, v3, v4, v5);
+		*/
 	}
 	//this method returns to the basic room and the compoments of the border
 	getSquares(): Square[] {
@@ -418,6 +424,18 @@ export class Room {
 		return this.lineSize;
 	}
 
+	getWalls():Wall[] {
+		return this.walls;
+	}
+
+	setWalls(walls:Wall[]) {
+		this.walls = walls;
+	}
+
+	setWall(index:number, wall:Wall) {
+		this.walls[index]=wall;
+	}
+
 	equals(anotherRoom: Room): boolean {
 		if (anotherRoom.getRoomName() == this.getRoomName() && anotherRoom.getSquares()[0] == this.getSquares()[0] && anotherRoom.getSquares()[1] == this.getSquares()[1] && anotherRoom.getSquares()[2] == this.getSquares()[2] && anotherRoom.getSquares()[3] == this.getSquares()[3] && anotherRoom.getSquares()[4] == this.getSquares()[4] && anotherRoom.getLineSize() == this.lineSize && anotherRoom.getWidth() == this.getWidth() && anotherRoom.getHeight() == this.getHeight() && anotherRoom.getSquareMeter() == this.getSquareMeter()) {
 			return true;
@@ -430,7 +448,7 @@ export class Room {
 	//if any room contains the room (which we want to create) than we cannot create the room
 	contains(rooms: Room[]): number {
 
-		for (var i = 0; i < rooms.length; i++) {
+		/*for (var i = 0; i < rooms.length; i++) {
 			if (!(this.getSquares()[2].getLeftLowerCoordinate()[0] > rooms[i].getSquares()[1].getRightUpperCoordinate()[0]
 				|| this.getSquares()[1].getRightUpperCoordinate()[0] < rooms[i].getSquares()[2].getLeftLowerCoordinate()[0]
 				|| this.getSquares()[2].getLeftLowerCoordinate()[1] > rooms[i].getSquares()[1].getRightUpperCoordinate()[1]
@@ -446,7 +464,7 @@ export class Room {
 				//if the room contains another existing room returns the index of the existing room 
 				return i;
 			}
-		}
+		}*/
 		//if the room does not contain another existing room returns -1 
 		return -1;
 	}

@@ -16,6 +16,8 @@ import { Component } from './Component';
 import { MultiLineText } from './MultiLineText';
 import { LineGrid } from './LineGrid';
 import { TexturedGrid } from './TexturedGrid';
+import { LocalResourceLoader } from './LocalResourceLoader';
+import { ComponentList } from './ComponentList';
 
 interface ClickCallback {
 	(x, y): void;
@@ -211,6 +213,16 @@ export class Main implements Visitor {
 		const border = 0;
 		const srcFormat = this.gl.RGBA;
 		const srcType = this.gl.UNSIGNED_BYTE;
+
+		/*const pixel = new Uint8Array([0, 0, 255, 255]);
+
+		this.gl.texImage2D(this.gl.TEXTURE_2D, level, internalFormat,
+			width, height, border, srcFormat, srcType,
+			pixel);
+
+		const image = new Image();
+		image.onload = () => {*/
+
 		this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
 		this.gl.texImage2D(this.gl.TEXTURE_2D, level, internalFormat,
 			srcFormat, srcType, image);
@@ -231,6 +243,9 @@ export class Main implements Visitor {
 			this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
 			this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
 		}
+	
+		/*};
+		image.src = "grid2.jpg";*/
 		return texture;
 	}
 	isPowerOf2 = (value) => {
@@ -277,175 +292,44 @@ export class Main implements Visitor {
 		// make a 2D context for it
 		let ctx = textCanvas.getContext("2d");
 		ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-		const image = new Image();
-		image.onload = () => {
+		/*const image = new Image();
+		image.onload = () => {*/
+
 			if (!scene) {
 				scene = this.scene;
 			}
+
+		let grids:Component[] = scene.getGrid();
+		let gridList = new ComponentList(grids);
+		gridList.loadResourceForComponents(new LocalResourceLoader()).then( ()=>{
+		if (grids) {
+
 			this.gl.clearColor(1, 1, 1, 0.9);
 			this.gl.clearDepth(1.0);
 			this.gl.enable(this.gl.DEPTH_TEST);
 			this.gl.depthFunc(this.gl.LEQUAL);
 			this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-			let grid = scene.getGrid();
-			if (grid) {
-				if (scene instanceof Scene3D) {
-					let scalar = 2048;
-					let vecs = grid[0];
-					let buffers = this.initBuffersTexture(vecs, [
-						scalar, scalar,
-						scalar, 0.0,
-						0.0, 0.0,
-						0, scalar
-					], [0, 1, 2, 0, 2, 3]);
 
-					const texture = this.loadTexture(image);
-					{
-						const numComponents = 3;
-						const type = this.gl.FLOAT;
-						const normalize = false;
-						const stride = 0;
-						const offset = 0;
-						this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-						// Bind index buffer object
-						this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-						this.gl.vertexAttribPointer(
-							this.textureProgramInfo.attribLocations.vertexPosition,
-							numComponents,
-							type,
-							normalize,
-							stride,
-							offset);
-						this.gl.enableVertexAttribArray(
-							this.textureProgramInfo.attribLocations.vertexPosition);
-					}
-					// tell webgl how to pull out the texture coordinates from buffer
-					{
-						const num = 2; // every coordinate composed of 2 values
-						const type = this.gl.FLOAT; // the data in the buffer is 32 bit float
-						const normalize = false; // don't normalize
-						const stride = 0; // how many bytes to get from one set to the next
-						const offset = 0; // how many bytes inside the buffer to start from
-						this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.textureCoord);
-						this.gl.vertexAttribPointer(this.textureProgramInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
-						this.gl.enableVertexAttribArray(this.textureProgramInfo.attribLocations.textureCoord);
-					}
-					this.gl.useProgram(this.textureProgramInfo.program);
-					// Tell WebGL we want to affect texture unit 0
-					this.gl.activeTexture(this.gl.TEXTURE0);
-					// Bind the texture to texture unit 0
-					this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-					// Tell the shader we bound the texture to texture unit 0
-					this.gl.uniform1i(this.textureProgramInfo.uniformLocations.uSampler, 0);
-					this.gl.uniformMatrix4fv(
-						this.textureProgramInfo.uniformLocations.projectionMatrix,
-						false,
-						scene.getProjectionMatrix());
-					this.gl.uniformMatrix4fv(
-						this.textureProgramInfo.uniformLocations.modelViewMatrix,
-						false,
-						scene.getModelViewMatrix());
-					this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
+			grids.forEach(grid=>grid.accept(this));				
+		
+		//	if (scene instanceof Scene2D) {
+				let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
+				let ctx = textCanvas.getContext("2d");
+				ctx.font = "15px Arial";
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'top';
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-
-					let gridHeight = Math.abs((vecs[2] - vecs[5]) / 2048);
-					let gridWidth = Math.abs((vecs[6] - vecs[3]) / 2048);
-
-					console.log(`grid height: ${(vecs[2] - vecs[5]) / 2048} `);
-					console.log(`grid width: ${(vecs[6] - vecs[3]) / 2048} `);
-
-					{
-
-						console.log([
-							vecs[3] + 1023 * gridWidth, vecs[1] + 0.00001, vecs[5],
-							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5],
-							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5] - 2.5 * gridHeight,
-						])
-
-						let buffers = this.initBuffers([
-							vecs[3] + 1023 * gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5],
-							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5],
-							vecs[3] + 1023 * gridWidth + gridWidth + gridWidth / 2, vecs[1] + 0.00001, vecs[5] - 2.5 * gridHeight,
-						], [0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0,]);
-
-						{
-							const numComponents = 3;
-							const type = this.gl.FLOAT;
-							const normalize = false;
-							const stride = 0;
-							const offset = 0;
-
-							this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
-							this.gl.vertexAttribPointer(
-								this.colorProgramInfo.attribLocations.vertexPosition,
-								numComponents,
-								type,
-								normalize,
-								stride,
-								offset);
-							this.gl.enableVertexAttribArray(
-								this.colorProgramInfo.attribLocations.vertexPosition);
-						}
-
-						{
-							const numComponents = 4;
-							const type = this.gl.FLOAT;
-							const normalize = false;
-							const stride = 0;
-							const offset = 0;
-							this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
-							this.gl.vertexAttribPointer(
-								this.colorProgramInfo.attribLocations.vertexColor,
-								numComponents,
-								type,
-								normalize,
-								stride,
-								offset);
-							this.gl.enableVertexAttribArray(
-								this.colorProgramInfo.attribLocations.vertexColor);
-						}
-
-						this.gl.useProgram(this.colorProgramInfo.program);
-
-						this.gl.uniformMatrix4fv(
-							this.colorProgramInfo.uniformLocations.projectionMatrix,
-							false,
-							scene.getProjectionMatrix());
-						this.gl.uniformMatrix4fv(
-							this.colorProgramInfo.uniformLocations.modelViewMatrix,
-							false,
-							scene.getModelViewMatrix());
-
-						{
-							const offset = 0;
-							let vertexCount = scene.getVertexCount();
-							this.gl.drawArrays(this.gl.TRIANGLES, offset, vertexCount);
-						}
-
-					}
-
-					//2D rács
-				} else {
-					let grid:Component = scene.getGrid();
-					grid.accept(this);
+				let component: Component[] = this.scene.getDrawingRooms();
+				for (let i = 0; i < component.length; i++) {
+					component[i].accept(this);
 				}
-				if (scene instanceof Scene2D) {
-					let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
-					var ctx = textCanvas.getContext("2d");
-					ctx.font = "15px Arial";
-					ctx.textAlign = 'center';
-					ctx.textBaseline = 'top';
-					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			//}
+		}
 
-					let component: Component[] = this.scene.getDrawingRooms();
-					for (let i = 0; i < component.length; i++) {
-						//this.drawColoredTriangle(triangles[i]);
-						component[i].accept(this);
-					}
-				}
-			}
-		};
-		image.src = "grid2.jpg";
+	});
+		/*};
+		image.src = "grid2.jpg";*/
 	}
 
 	drawMultiLineText(multiLineText: MultiLineText) {
@@ -508,11 +392,71 @@ export class Main implements Visitor {
 	}
 
 	drawTexturedGrid(texturedGrid: TexturedGrid) {
+		/*let scalar = 2048;*/
+		/*let buffers = this.initBuffersTexture(vecs, [
+			scalar, scalar,
+			scalar, 0.0,
+			0.0, 0.0,
+			0, scalar
+		], [0, 1, 2, 0, 2, 3]);*/
 
-	}
+		let buffers = this.initBuffersTexture(texturedGrid.getVerticesArray(),
+			texturedGrid.getTextureCoordinatesArray(), texturedGrid.getVertexIndices());
+
+		let image  = texturedGrid.getImages()[0];
+
+		const texture = this.loadTexture(image);
+		{
+			const numComponents = 3;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+			// Bind index buffer object
+			this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+			this.gl.vertexAttribPointer(
+				this.textureProgramInfo.attribLocations.vertexPosition,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.textureProgramInfo.attribLocations.vertexPosition);
+		}
+		// tell webgl how to pull out the texture coordinates from buffer
+		{
+			const num = 2; // every coordinate composed of 2 values
+			const type = this.gl.FLOAT; // the data in the buffer is 32 bit float
+			const normalize = false; // don't normalize
+			const stride = 0; // how many bytes to get from one set to the next
+			const offset = 0; // how many bytes inside the buffer to start from
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.textureCoord);
+			this.gl.vertexAttribPointer(this.textureProgramInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
+			this.gl.enableVertexAttribArray(this.textureProgramInfo.attribLocations.textureCoord);
+		}
+		this.gl.useProgram(this.textureProgramInfo.program);
+		// Tell WebGL we want to affect texture unit 0
+		this.gl.activeTexture(this.gl.TEXTURE0);
+		// Bind the texture to texture unit 0
+		this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+		// Tell the shader we bound the texture to texture unit 0
+		this.gl.uniform1i(this.textureProgramInfo.uniformLocations.uSampler, 0);
+		this.gl.uniformMatrix4fv(
+			this.textureProgramInfo.uniformLocations.projectionMatrix,
+			false,
+			this.scene.getProjectionMatrix());
+		this.gl.uniformMatrix4fv(
+			this.textureProgramInfo.uniformLocations.modelViewMatrix,
+			false,
+			this.scene.getModelViewMatrix());
+		this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
+	};
 
 	drawTriangle(triangle: Triangle) {
-		console.log("HAROMSZOG");
+		//console.log("HAROMSZOG");
+		//console.log(triangle.getVerticesArray());
 		let buffers = this.initBuffers(triangle.getVerticesArray(), triangle.getColorArray());
 		{
 			const numComponents = 3;
@@ -592,9 +536,12 @@ export class Main implements Visitor {
 	}
 	subscribeClick(clickCallback: ClickCallback): void {
 		this.canvas.addEventListener("click", (event) => {
+			let borderLeft = 10;
+			let borderTop = 10;
+			//console.log(borderLeft + " " + borderTop);
 			var rect = this.canvas.getBoundingClientRect();
-			let x = event.clientX - rect.left;
-			let y = event.clientY - rect.top;
+			let x = event.clientX - rect.left - borderLeft;
+			let y = event.clientY - rect.top - borderTop;
 			clickCallback(x, y);
 		}, false);
 	}

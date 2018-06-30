@@ -7,6 +7,7 @@ import { Room } from './webgl/Room';
 import { Camera } from './webgl/Camera';
 
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
+import { Wall } from './webgl/Wall';
 let scene2D = new Scene2D(1000, 800, 45, 0.1, 100, -5, true);
 let scene3D = new Scene3D(1000, 800, 45, 0.1, 100, 0, true);
 let main = new Main('#glcanvas');
@@ -14,6 +15,8 @@ let points: vec3[] = [];
 let indexRemoveRoom = -1;
 let clickedX;
 let clickedY;
+
+let selectedWall:Wall;
 
 /* yaw is initialized to -90.0 degrees since a yaw of 0.0 results 
    in a direction vector pointing to the right so we initially rotate a bit to the left.
@@ -57,19 +60,19 @@ document.addEventListener('keydown',
 	function press(e) {
 		//event.preventDefault();
 		//WASD control
-		if( e.keyCode === 87 /* w */) {
-			
-		}
-
-		if(e.keyCode === 68 /* d */) {
-			
-		}
-
-		if(e.keyCode === 83 /* s */) {
+		if (e.keyCode === 87 /* w */) {
 
 		}
 
-		if(e.keyCode === 65 /* a */) {
+		if (e.keyCode === 68 /* d */) {
+
+		}
+
+		if (e.keyCode === 83 /* s */) {
+
+		}
+
+		if (e.keyCode === 65 /* a */) {
 
 		}
 
@@ -101,6 +104,8 @@ select2D.addEventListener("click", (event) => {
 select3D.addEventListener("click", (event) => {
 	isIn2DMode = false;
 	isIn3DMode = true;
+	let rooms:Room[] = scene2D.getRooms();
+	scene3D.setRooms(rooms);
 	scene3D.setCamera(camera);
 	main.setScene(scene3D);
 	main.drawScene();
@@ -160,7 +165,9 @@ addNewRoomHTMLInput.addEventListener("click", (event) => {
 	let indexOfActualRoom = new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues).contains(scene2D.getRooms());
 	//the room can be created
 	if (indexOfActualRoom == -1 && indexRemoveRoom == -1) {
-		scene2D.addRoom(new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues));
+		scene2D.addRoom(new Room(square, roomBorder, roomName, roomWidthSquareM, roomHeightSquareM, roomWidthSquareM * roomHeightSquareM, roomMValues),
+	 selectedWall);
+	 console.log(scene2D.getWallGeometries());
 	} else {
 		//the room is exists, we would like to delete or modify the room
 		if (indexRemoveRoom != -1) {
@@ -253,13 +260,31 @@ addWindowHTMLInput.addEventListener("click", (event) => {
 //the click action
 main.subscribeClick((x, y) => {
 	//we determine the coordinate of the clicked point
+	//console.log(x + " " + y);
 	let [p, d] = scene2D.getRayTo2DPoint(x, y);
 	let clickedPoint = scene2D.convert2DPointTo3DWorld(x, y)
 	clickedX = clickedPoint[0];
 	clickedY = clickedPoint[1];
 	let result = false;
+
+	for (let i = 0; i < scene2D.getWallGeometries().length; i++) {
+		let wallGeometry = scene2D.getWallGeometries()[i];
+		for (let j = 0; j < wallGeometry.getSquare().getTriangles().length; j++) {
+			//console.log(wallGeometry.getSquare().getTriangles()[j].getVerticesArray());
+			result = wallGeometry.getSquare().rayIntersectsSquare(p, d, scene2D.getModelViewMatrix());
+			if (result) {
+				//indexRemoveRoom = i;
+				//removeRoomHTMLInput.disabled = false;
+				console.log(wallGeometry.getWall().getOrientation());
+				selectedWall = wallGeometry.getWall();
+				break;
+			}
+		}
+	}
+
+
 	//we determine the room (the clicked point can belong to one room or other area)
-	for (let i = 0; i < scene2D.getRooms().length; i++) {
+	/*for (let i = 0; i < scene2D.getRooms().length; i++) {
 		for (let j = 0; j < scene2D.getRooms()[i].getSquares().length; j++) {
 			for (let k = 0; k < scene2D.getRooms()[i].getSquares()[j].getTriangles().length; k++) {
 				result = scene2D.getRooms()[i].getSquares()[j].getTriangles()[k].rayIntersectsTriangle(p, d, scene2D.getModelViewMatrix());
@@ -293,6 +318,7 @@ main.subscribeClick((x, y) => {
 		(<HTMLInputElement>document.getElementById("roomHeight")).value = scene2D.getRooms()[indexRemoveRoom].getRoomMValues()[3] + "";
 		(<HTMLInputElement>document.getElementById("roomName")).value = scene2D.getRooms()[indexRemoveRoom].getRoomName() + "";
 		(<HTMLInputElement>document.getElementById("roomBorder")).value = scene2D.getRooms()[indexRemoveRoom].getRoomMValues()[4] + "";
-	}
+	}*/
+
 	//alert(result);
 });

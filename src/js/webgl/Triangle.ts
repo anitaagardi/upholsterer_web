@@ -5,7 +5,7 @@ import { Visitor } from './Visitor';
 The triangle is the atomic unit.
 The rooms, doors, windows consits of squares, and the squares consits of triangles.
 */
-export class Triangle implements Component{
+export class Triangle extends Component{
 	//the vertices of the triangle
 	private vertices: vec3[] = [];
 	//the color of the triangle
@@ -14,6 +14,7 @@ export class Triangle implements Component{
 	//the three point and the color
 	//the color is important also, the room, door and the window has different colors
 	constructor(v0: vec3, v1: vec3, v2: vec3, color: vec4) {
+		super();
 		this.vertices = [...this.vertices, v0, v1, v2];
 		this.color = color;
 	}
@@ -24,8 +25,10 @@ export class Triangle implements Component{
 		let v0 = this.vertices[0];
 		let v1 = this.vertices[1];
 		let v2 = this.vertices[2];
+		//console.log(v0);
 		let temp_v0 = vec4.create();
 		vec4.transformMat4(temp_v0, vec4.fromValues(v0[0], v0[1], v0[2], 1.0), modelViewMatrix);
+		//console.log(temp_v0);
 		let temp_v1 = vec4.create();;
 		vec4.transformMat4(temp_v1, vec4.fromValues(v1[0], v1[1], v1[2], 1.0), modelViewMatrix);
 		let temp_v2 = vec4.create();;
@@ -33,6 +36,7 @@ export class Triangle implements Component{
 		v0 = vec3.fromValues(temp_v0[0], temp_v0[1], temp_v0[2]);
 		v1 = vec3.fromValues(temp_v1[0], temp_v1[1], temp_v1[2]);
 		v2 = vec3.fromValues(temp_v2[0], temp_v2[1], temp_v2[2]);
+		
 		let e1 = vec3.create();
 		let e2 = vec3.create();
 		vec3.subtract(e1, v1, v0);
@@ -61,6 +65,7 @@ export class Triangle implements Component{
 		else // this means that there is a line intersection
 			// but not a ray intersection
 			return false;
+			
 	}
 	//the vertices of the triangle fitting opengl input format
 	getVerticesArray() {
