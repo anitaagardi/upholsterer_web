@@ -87,6 +87,10 @@ module.exports = {
       { 
         from: 'src/css/main.css',
         to: './css/main.css'
+      },
+      { 
+        from: 'src/models/**/*',
+        to: './models/[name].[ext]'
       }
         /*,
 			

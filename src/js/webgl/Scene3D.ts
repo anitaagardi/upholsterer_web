@@ -389,7 +389,7 @@ export class Scene3D implements Scene {
 						}
 					}
 
-				
+					let box:Box = null;
 					if (wallOrientation == Direction.UP) {
 						let roomUpperLeftX = room.getRoomMValues()[0];
 						let roomUpperLeftY = room.getRoomMValues()[1];
@@ -409,11 +409,12 @@ export class Scene3D implements Scene {
 						);
 
 						wallGeometry = new WallGeometry(wall, wallRectangle);
-						let box = new Box(this.gridHeight*2, wallRectangle,vec4.fromValues(192/255, 192/255, 192/255, 1.0));
-						for(let k=0; k<box.getFaces().length; k++) {
+						box = new Box(this.gridHeight*2, wallRectangle,vec4.fromValues(192/255, 192/255, 192/255, 1.0));
+						/*for(let k=0; k<box.getFaces().length; k++) {
 							components = [...components, ...box.getFaces()[k].getTriangles()];	
-						}
-					    //components = [...components, ...wallRectangle.getTriangles()];
+						}*/
+						//components = [...components, ...wallRectangle.getTriangles()];
+						components = [...components, box];
 						this.wallGeometries.push(wallGeometry);
 						
 					} else if (wallOrientation == Direction.DOWN) {
@@ -438,9 +439,10 @@ export class Scene3D implements Scene {
 						wallGeometry = new WallGeometry(wall, wallRectangle);
 						
 						let box = new Box(this.gridHeight*2, wallRectangle,vec4.fromValues(192/255, 192/255, 192/255, 1.0));
-						for(let k=0; k<box.getFaces().length; k++) {
+						/*for(let k=0; k<box.getFaces().length; k++) {
 							components = [...components, ...box.getFaces()[k].getTriangles()];	
-						}
+						}*/
+						components = [...components, box];
 						this.wallGeometries.push(wallGeometry);
 						
 
@@ -466,9 +468,10 @@ export class Scene3D implements Scene {
 						wallGeometry = new WallGeometry(wall, wallRectangle);
 						
 						let box = new Box(this.gridHeight*2, wallRectangle,vec4.fromValues(192/255, 192/255, 192/255, 1.0));
-						for(let k=0; k<box.getFaces().length; k++) {
+						/*for(let k=0; k<box.getFaces().length; k++) {
 							components = [...components, ...box.getFaces()[k].getTriangles()];	
-						}
+						}*/
+						components = [...components, box];
 						this.wallGeometries.push(wallGeometry);
 						
 					} else if (wallOrientation == Direction.RIGHT) {
@@ -493,9 +496,10 @@ export class Scene3D implements Scene {
 						wallGeometry = new WallGeometry(wall, wallRectangle);
 						//components = [...components, ...wallRectangle.getTriangles()];
 						let box = new Box(this.gridHeight*2, wallRectangle,vec4.fromValues(192/255, 192/255, 192/255, 1.0));
-						for(let k=0; k<box.getFaces().length; k++) {
+						/*for(let k=0; k<box.getFaces().length; k++) {
 							components = [...components, ...box.getFaces()[k].getTriangles()];	
-						}
+						}*/
+						components = [...components, box];
 						this.wallGeometries.push(wallGeometry);
 
 					}

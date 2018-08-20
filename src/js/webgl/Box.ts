@@ -1,7 +1,10 @@
 import { Rectangle } from "./Rectangle";
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
+import { Component } from "./Component";
+import { ResourceLoader } from "./ResourceLoader";
+import { Visitor } from "./Visitor";
 
-export class Box {
+export class Box implements Component {
     private faces:Rectangle[] = [];
     constructor(private height: number, private base: Rectangle, private color:vec4) {
         let leftLower = base.getLeftLower();
@@ -66,11 +69,33 @@ export class Box {
         return this.faces;
     }
 
-    /*getVerticesArray() {
+    accept(v: Visitor) {
+        v.drawBox(this);
+    }
 
+    loadResource(resourceLoader: ResourceLoader): Promise<any[]> {
+        throw new Error("Method not implemented.");
+    }
+
+    getVerticesArray() {
+        let verticesArray=[];
+        for(let i=0; i<this.faces.length; i++) {
+            let triangles = this.faces[i].getTriangles();
+            for(let j=0; j<triangles.length; j++) {
+                verticesArray = [ ...verticesArray, ...triangles[j].getVerticesArray()];
+            }
+        }
+        return verticesArray;
     }
 
     getColorArray() {
-
-    }*/
+        let colorArray=[];
+        for(let i=0; i<this.faces.length; i++) {
+            let triangles = this.faces[i].getTriangles();
+            for(let j=0; j<triangles.length; j++) {
+                colorArray = [ ...colorArray, ...triangles[j].getColorArray()];
+            }
+        }
+        return colorArray;
+    }
 }

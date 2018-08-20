@@ -18,6 +18,7 @@ import { LineGrid } from './LineGrid';
 import { TexturedGrid } from './TexturedGrid';
 import { LocalResourceLoader } from './LocalResourceLoader';
 import { ComponentList } from './ComponentList';
+import { Box } from './Box';
 
 interface ClickCallback {
 	(x, y): void;
@@ -90,8 +91,8 @@ export class Main implements Visitor {
 			// Capture mouse down offset position
 			md.preventDefault();
 
-			this.lastX = md.clientX,
-				this.lastY = md.clientY;
+			this.lastX = md.clientX;
+			this.lastY = md.clientY;
 
 			// B1. Track mouse position differentials using mousemove until we hear a mouseup
 			return mousemove.map((mm: any) => {
@@ -243,7 +244,7 @@ export class Main implements Visitor {
 			this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
 			this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
 		}
-	
+
 		/*};
 		image.src = "grid2.jpg";*/
 		return texture;
@@ -295,24 +296,24 @@ export class Main implements Visitor {
 		/*const image = new Image();
 		image.onload = () => {*/
 
-			if (!scene) {
-				scene = this.scene;
-			}
+		if (!scene) {
+			scene = this.scene;
+		}
 
-		let grids:Component[] = scene.getGrid();
+		let grids: Component[] = scene.getGrid();
 		let gridList = new ComponentList(grids);
-		gridList.loadResourceForComponents(new LocalResourceLoader()).then( ()=>{
-		if (grids) {
+		gridList.loadResourceForComponents(new LocalResourceLoader()).then(() => {
+			if (grids) {
 
-			this.gl.clearColor(1, 1, 1, 0.9);
-			this.gl.clearDepth(1.0);
-			this.gl.enable(this.gl.DEPTH_TEST);
-			this.gl.depthFunc(this.gl.LEQUAL);
-			this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+				this.gl.clearColor(1, 1, 1, 0.9);
+				this.gl.clearDepth(1.0);
+				this.gl.enable(this.gl.DEPTH_TEST);
+				this.gl.depthFunc(this.gl.LEQUAL);
+				this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-			grids.forEach(grid=>grid.accept(this));				
-		
-		//	if (scene instanceof Scene2D) {
+				grids.forEach(grid => grid.accept(this));
+
+				//	if (scene instanceof Scene2D) {
 				let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
 				let ctx = textCanvas.getContext("2d");
 				ctx.font = "15px Arial";
@@ -324,10 +325,10 @@ export class Main implements Visitor {
 				for (let i = 0; i < component.length; i++) {
 					component[i].accept(this);
 				}
-			//}
-		}
+				//}
+			}
 
-	});
+		});
 		/*};
 		image.src = "grid2.jpg";*/
 	}
@@ -403,7 +404,7 @@ export class Main implements Visitor {
 		let buffers = this.initBuffersTexture(texturedGrid.getVerticesArray(),
 			texturedGrid.getTextureCoordinatesArray(), texturedGrid.getVertexIndices());
 
-		let image  = texturedGrid.getImages()[0];
+		let image = texturedGrid.getImages()[0];
 
 		const texture = this.loadTexture(image);
 		{
@@ -508,6 +509,57 @@ export class Main implements Visitor {
 		}
 	}
 
+	drawBox(box: Box) {
+		let verticesArray = box.getVerticesArray();
+		let buffers = this.initBuffers(verticesArray, box.getColorArray());
+		{
+			const numComponents = 3;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.position);
+			this.gl.vertexAttribPointer(
+				this.colorProgramInfo.attribLocations.vertexPosition,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.colorProgramInfo.attribLocations.vertexPosition);
+		}
+		{
+			const numComponents = 4;
+			const type = this.gl.FLOAT;
+			const normalize = false;
+			const stride = 0;
+			const offset = 0;
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.color);
+			this.gl.vertexAttribPointer(
+				this.colorProgramInfo.attribLocations.vertexColor,
+				numComponents,
+				type,
+				normalize,
+				stride,
+				offset);
+			this.gl.enableVertexAttribArray(
+				this.colorProgramInfo.attribLocations.vertexColor);
+		}
+		this.gl.useProgram(this.colorProgramInfo.program);
+		this.gl.uniformMatrix4fv(
+			this.colorProgramInfo.uniformLocations.projectionMatrix,
+			false,
+			this.scene.getProjectionMatrix());
+		this.gl.uniformMatrix4fv(
+			this.colorProgramInfo.uniformLocations.modelViewMatrix,
+			false,
+			this.scene.getModelViewMatrix());
+		{
+			const offset = 0;
+			this.gl.drawArrays(this.gl.TRIANGLES, offset, verticesArray.length / 3);
+		}
+	}
 
 	initShaderProgram(vsSource: string, fsSource: string): any {
 		const vertexShader = this.loadShader(this.gl.VERTEX_SHADER, vsSource);
