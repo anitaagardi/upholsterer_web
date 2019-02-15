@@ -43,11 +43,18 @@ export class Main implements Visitor {
 	private dragged: boolean;
 	private lastX: number;
 	private lastY: number;
+	private width: number;
+	private height: number;
 
 	private sceneDraggingEvent: Observable<any>;
 
 	constructor(htmlCanvasElementId: string) {
 		this.canvas = document.querySelector(htmlCanvasElementId);
+
+		let canvasParentRect = this.canvas.getBoundingClientRect();
+		this.width = canvasParentRect.width;
+		this.height = canvasParentRect.height;
+
 		this.gl = this.canvas.getContext('webgl2') as WebGL2RenderingContext;
 		if (!this.gl) {
 			alert('Unable to initialize WebGL. Your browser or machine may not support it.');
@@ -180,8 +187,13 @@ export class Main implements Visitor {
 
 	}
 
+	getWidth():number {
+		return this.width;
+	}
 
-
+	getHeight():number {
+		return this.height;
+	}
 	//subscribe to an event
 	//if we add anything to the scene, this method redraw
 	setScene = (scene: Scene) => {
@@ -289,10 +301,9 @@ export class Main implements Visitor {
 		};
 	}
 	drawScene(scene?: Scene) {
-		let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
-		// make a 2D context for it
+		/*let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
 		let ctx = textCanvas.getContext("2d");
-		ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+		ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);*/
 		/*const image = new Image();
 		image.onload = () => {*/
 
@@ -314,18 +325,19 @@ export class Main implements Visitor {
 				grids.forEach(grid => grid.accept(this));
 
 				//	if (scene instanceof Scene2D) {
-				let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
+				/*let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
 				let ctx = textCanvas.getContext("2d");
 				ctx.font = "15px Arial";
 				ctx.textAlign = 'center';
 				ctx.textBaseline = 'top';
-				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);*/
 
-				let component: Component[] = this.scene.getDrawingRooms();
+				//}
+
+				/*let component: Component[] = this.scene.getDrawingRooms();
 				for (let i = 0; i < component.length; i++) {
 					component[i].accept(this);
-				}
-				//}
+				}*/
 			}
 
 		});
@@ -334,14 +346,12 @@ export class Main implements Visitor {
 	}
 
 	drawMultiLineText(multiLineText: MultiLineText) {
-		let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
+		/*let textCanvas: HTMLCanvasElement = document.getElementById("text") as HTMLCanvasElement;
 		var ctx = textCanvas.getContext("2d");
 		ctx.font = 12 + "px Arial";
-		//ctx.fillText(scene.getRooms()[i].getRoomName() + "", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) - 6);
-		//ctx.fillText(scene.getRooms()[i].getSquareMeter() + " m2 ", (screenPointFrom[0] + screenPointTo[0]) / 2, ((screenPointFrom[1] + screenPointTo[1]) / 2) + 6);
 		for (let i = 0; i < multiLineText.getLines().length; i++) {
 			ctx.fillText(multiLineText.getLines()[i], multiLineText.getX()[i], multiLineText.getY()[i]);
-		}
+		}*/
 	}
 
 	drawLineGrid(lineGrid: LineGrid) {

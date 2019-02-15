@@ -18,7 +18,7 @@ module.exports = {
     //contentBase: path.join(__dirname, "./build/dist/angularjs/static"),
     //publicPath: "./build/dist/angularjs/static",
     compress: true,
-    port: 9000,
+    port: 9100,
     hot: false,
     stats: {
         assets: true,

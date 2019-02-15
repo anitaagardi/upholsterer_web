@@ -5,7 +5,11 @@
 </head>
 
 <body>
-	<div class="banner">
+	<div class="navbar">
+		<div>
+		    Lakberendező alkalmazás
+		</div>
+		<!--
 		<ul>
 			<li class="active" style="padding: 5px 250px;font-size: 40px">Lakberendező alkalmazás</li>
 			<li>
@@ -15,17 +19,21 @@
 				<span id="3d">3D alaprajz</span>
 			</li>
 		</ul>
+		-->
 	</div>
 	<div class="editor">
 		<div class="container">
 			<canvas id="glCanvas" width="1000" height="800"></canvas>
+			<!--
 			<canvas id="text" width="1000" height="800"></canvas>
+			-->
 		</div>
-		<div>
-
-
+		<div class="right-toolbar">
+			<!--
 			<h3 class="formText">Új szoba létrehozása:</h3>
-			<form id="roomForm">
+			-->
+			<div>
+			
 				<div>
 					<input type="number" id="roomUpperLeftX" placeholder="Bal felső X koordináta (m):" />
 				</div>
@@ -79,10 +87,9 @@
 				<div>
 					<button id="texture">Textúrázás</button>
 				</div>
-			</form>
-
+			
+		    </div>
 		</div>
-
 	</div>
 	<script src="js/main.js"></script>
 </body>
